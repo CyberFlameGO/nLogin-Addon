@@ -14,7 +14,7 @@ The addon will check if the password is registered and use it. If the password i
 
 ## Synchronization
 Password synchronization is performed with the zero knowledge technique. This means that the accessed server will not be able to know your passwords, since the whole encryption and decryption process is done on the client side.<br>
-See more details in <a href="https://github.com/nickuc/nLogin-Addon/blob/master/src/main/java/com/nickuc/login/addon/resource/Synchronization.java#L38">Synchronization</a> class.
+See more details in <a href="https://github.com/nickuc/nLogin-Addon/blob/master/src/main/java/com/nickuc/login/addon/sync/Synchronization.java#L38">Synchronization</a> class.
 
 ## Compiling
 #### Requirements:

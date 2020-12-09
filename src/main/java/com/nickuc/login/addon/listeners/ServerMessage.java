@@ -18,7 +18,7 @@ import com.nickuc.login.addon.model.response.LoginFinishResponse;
 import com.nickuc.login.addon.model.response.ReadyResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;
 import com.nickuc.login.addon.nLoginAddon;
-import com.nickuc.login.addon.resource.Synchronization;
+import com.nickuc.login.addon.sync.Synchronization;
 import com.nickuc.login.addon.utils.SafeGenerator;
 import com.nickuc.login.addon.utils.crypt.AesGcm;
 import com.nickuc.login.addon.utils.hash.Sha256;

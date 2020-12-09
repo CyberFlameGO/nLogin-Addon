@@ -5,7 +5,7 @@
  * https://github.com/nickuc
  */
 
-package com.nickuc.login.addon.resource;
+package com.nickuc.login.addon.sync;
 
 import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.lang.Lang;
