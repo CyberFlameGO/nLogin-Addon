@@ -58,36 +58,6 @@ public class nLoginAddon extends LabyModAddon {
         eventManager.register(new ServerMessage(this));
     }
 
-    private void onUnistall() {
-        if (credentials != null) {
-            File parent = credentialsFile.getParentFile();
-
-            //if (parent.isDirectory() && parent.getName().contains("nlogin")) {
-            if (parent.isDirectory() && parent.getName().equals("nLogin-Addon")) {
-                File[] files = parent.listFiles();
-                if (files == null) return;
-
-                if (files.length > 0) {
-                    for (File f : files) {
-                        if (!f.getName().endsWith(".json")) continue;
-
-                        if (!f.delete()) {
-                            System.err.println(Constants.PREFIX + "Failed to delete '" + f.getPath() + "'.");
-                        }
-                    }
-                }
-
-                files = parent.listFiles();
-                if (files == null) return;
-
-                if (files.length == 0 && !parent.delete()) {
-                    System.err.println(Constants.PREFIX + "Failed to delete directory '" + parent.getPath() + "'.");
-                }
-            }
-        }
-        System.out.println(Constants.PREFIX + "Addon successfully uninstalled.");
-    }
-
     @Override
     public void loadConfig() {
 
@@ -95,11 +65,11 @@ public class nLoginAddon extends LabyModAddon {
         settings = Constants.GSON_PRETTY.fromJson(config, AddonSettings.class);
 
         if (SystemUtils.IS_OS_WINDOWS) {
-            credentialsFile = new File(System.getenv("APPDATA") + File.separator + "nlogin" + File.separator + "credentials.json");
+            credentialsFile = new File(System.getenv("APPDATA") + File.separator + "nLogin", "credentials.json");
         } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_UNIX) {
             credentialsFile = new File(System.getProperty("user.home"), ".nlogin" + File.separator + "credentials.json");
         } else {
-            credentialsFile = new File(FileSystemView.getFileSystemView().getDefaultDirectory(), "nlogin" + File.separator + "credentials.json");
+            credentialsFile = new File(FileSystemView.getFileSystemView().getDefaultDirectory() + File.separator + "nLogin", "credentials.json");
         }
 
         File parent = credentialsFile.getParentFile();
@@ -184,14 +154,6 @@ public class nLoginAddon extends LabyModAddon {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                nLoginAddon addon = (nLoginAddon) AddonLoader.getAddonByUUID(nLoginAddon.this.about.uuid);
-                if (addonFile != null && !addonFile.exists()) {
-                    System.out.println(Constants.PREFIX + "Addon removed, performing unnistall tasks...");
-                    onUnistall();
-                    cancel();
-                    return;
-                }
-
                 synchronized (Constants.LOCK) {
                     if (credentialsModified) {
                         System.out.println(Constants.PREFIX + "Saving credentials changes...");
@@ -216,7 +178,7 @@ public class nLoginAddon extends LabyModAddon {
                     }
                 }
 
-                if (addon == null || !addon.about.loaded) {
+                if (!nLoginAddon.this.about.loaded) {
                     cancel();
                 }
             }
