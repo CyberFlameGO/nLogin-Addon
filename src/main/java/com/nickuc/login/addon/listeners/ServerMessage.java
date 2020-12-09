@@ -127,7 +127,7 @@ public class ServerMessage implements ServerMessageEvent {
                                 for (String ck : user.getCryptKeys()) {
                                     if (ck.equals(cryptKey)) continue;
 
-                                    if (Sha256.hash(Sha256.hash(cryptKey + masterPassword)).equals(checksum)) {
+                                    if (Sha256.hash(Sha256.hash(ck + masterPassword)).equals(checksum)) {
                                         detected = true;
                                         cryptKey = ck;
                                         break;
