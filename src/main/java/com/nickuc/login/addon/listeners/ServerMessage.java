@@ -14,11 +14,11 @@ import com.nickuc.login.addon.lang.Lang;
 import com.nickuc.login.addon.model.Credentials;
 import com.nickuc.login.addon.model.Session;
 import com.nickuc.login.addon.model.request.SyncRequest;
-import com.nickuc.login.addon.model.request.UpdateRequest;
 import com.nickuc.login.addon.model.response.LoginFinishResponse;
 import com.nickuc.login.addon.model.response.ReadyResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;
 import com.nickuc.login.addon.nLoginAddon;
+import com.nickuc.login.addon.resource.Synchronization;
 import com.nickuc.login.addon.utils.SafeGenerator;
 import com.nickuc.login.addon.utils.crypt.AesGcm;
 import com.nickuc.login.addon.utils.hash.Sha256;
@@ -163,6 +163,7 @@ public class ServerMessage implements ServerMessageEvent {
                             Credentials.Server server = Credentials.Server.fromJson(json);
                             if (server != null) {
                                 addon.markModified(true);
+                                addon.getSession().setRequireSync(true);
                                 user.updateServer(server);
                                 user.addCryptKey(cryptKey);
 
@@ -174,8 +175,6 @@ public class ServerMessage implements ServerMessageEvent {
 
                                     System.out.println(Constants.PREFIX + "Sending '" + message + "'...");
                                     LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
-
-                                    sendUpdateRequest(server);
                                 }
                             }
                         }
@@ -186,45 +185,10 @@ public class ServerMessage implements ServerMessageEvent {
                     final LoginFinishResponse loginFinishResponse = addon.readResponse(jsonElement, LoginFinishResponse.class);
                     Session session = addon.getSession();
                     if (session.isActive() && session.isRequireSync()) {
-                        sendUpdateRequest(session.getServer());
+                        Synchronization.sendUpdateRequest(addon, session.getServer());
                     }
                     break;
             }
         }
-    }
-
-    private void sendUpdateRequest(final Credentials.Server server) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(750);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (!LabyMod.getInstance().isInGame()) return;
-                try {
-                    Credentials credentials = addon.getCredentials();
-                    Credentials.User user = credentials.getUser();
-                    String masterPassword = credentials.getMasterPassword();
-                    String primaryCryptKey = user.getPrimaryCryptKey();
-                    String encryptedPrimaryCryptKey = AesGcm.encrypt(primaryCryptKey, masterPassword);
-                    String encryptedData = AesGcm.encrypt(server.toJson().toString(), primaryCryptKey);
-                    String checksum = Sha256.hash(Sha256.hash(masterPassword + primaryCryptKey));
-
-                    // require auth
-                    UpdateRequest updateRequest = new UpdateRequest(encryptedPrimaryCryptKey, encryptedData, checksum);
-                    addon.sendRequest(updateRequest);
-                } catch (GeneralSecurityException e) {
-                    e.printStackTrace();
-                    synchronized (Constants.LOCK) {
-                        LabyMod.getInstance().displayMessageInChat("§4[" + Constants.DEFAULT_TITLE + "] §c" + Lang.Message.SYNC_FAILED_ENCRYPT.toText());
-                        LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.SYNC_FAILED_ENCRYPT.toText());
-                    }
-                }
-            }
-        };
-
-        Constants.EXECUTOR_SERVICE.submit(runnable);
     }
 }
