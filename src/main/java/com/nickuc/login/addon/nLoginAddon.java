@@ -143,7 +143,7 @@ public class nLoginAddon extends LabyModAddon {
 
         final File addonFile = path == null ? null : new File(path);
 
-        Timer timer = new Timer("nLoginAddon$SaveAndSync");
+        Timer timer = new Timer("nLoginAddon$Save");
 
         // save
         timer.scheduleAtFixedRate(new TimerTask() {
