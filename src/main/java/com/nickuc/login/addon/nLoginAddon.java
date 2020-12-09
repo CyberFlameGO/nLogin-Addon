@@ -21,7 +21,6 @@ import com.nickuc.login.addon.model.response.Response;
 import lombok.Cleanup;
 import lombok.Getter;
 import net.labymod.addon.AddonConfig;
-import net.labymod.addon.AddonLoader;
 import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
 import net.labymod.settings.elements.BooleanElement;
