@@ -3,7 +3,8 @@ package com.nickuc.login.addon.utils.crypt;
 import com.nickuc.login.addon.Constants;
 import org.apache.commons.codec.binary.Base64;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;

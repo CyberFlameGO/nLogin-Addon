@@ -8,7 +8,6 @@
 package com.nickuc.login.addon.model.request;
 
 import com.google.gson.JsonObject;
-import com.nickuc.login.addon.nLoginAddon;
 
 public interface Request {
 

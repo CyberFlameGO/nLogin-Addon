@@ -8,15 +8,8 @@
 package com.nickuc.login.addon.model.request;
 
 import com.google.gson.JsonObject;
-import com.nickuc.login.addon.model.Credentials;
-import com.nickuc.login.addon.nLoginAddon;
-import com.nickuc.login.addon.utils.crypt.AesGcm;
-import com.nickuc.login.addon.utils.hash.Sha256;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-import net.labymod.main.LabyMod;
-
-import java.security.GeneralSecurityException;
 
 @AllArgsConstructor @ToString
 public class UpdateRequest implements Request {

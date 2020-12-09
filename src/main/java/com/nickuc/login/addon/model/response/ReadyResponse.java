@@ -8,7 +8,6 @@
 package com.nickuc.login.addon.model.response;
 
 import com.google.gson.JsonObject;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

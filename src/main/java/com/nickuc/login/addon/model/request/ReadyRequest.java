@@ -10,11 +10,8 @@ package com.nickuc.login.addon.model.request;
 import com.google.gson.JsonObject;
 import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.model.AddonSettings;
-import com.nickuc.login.addon.model.Credentials;
-import com.nickuc.login.addon.utils.hash.Sha256;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-import sun.security.provider.MD5;
 
 @AllArgsConstructor @ToString
 public class ReadyRequest implements Request {
