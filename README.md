@@ -13,7 +13,7 @@ The addon will create a secure password and save to credentials.json file.
 The addon will check if the password is registered and use it. If the password is not registered and the synchronization feature is active, the addon will try to decrypt the content using the saved cryptKeys (see <a href="https://github.com/nickuc/nLogin-Addon/blob/master/src/main/java/com/nickuc/login/addon/listeners/ServerMessage.java#L111">ServerMessage</a>).
 
 ## Synchronization
-Password synchronization is performed with the zero knowledge technique. This means that the accessed server will not be able to know your passwords, since the whole encryption and decryption process is done on the client side..<br>
+Password synchronization is performed with the zero knowledge technique. This means that the accessed server will not be able to know your passwords, since the whole encryption and decryption process is done on the client side.<br>
 See more details in <a href="https://github.com/nickuc/nLogin-Addon/blob/master/src/main/java/com/nickuc/login/addon/resource/Synchronization.java#L38">Synchronization</a> class.
 
 ## Compiling
