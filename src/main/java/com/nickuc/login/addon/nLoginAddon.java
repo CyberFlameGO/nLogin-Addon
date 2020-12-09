@@ -32,7 +32,9 @@ import net.labymod.utils.Consumer;
 import net.labymod.utils.Material;
 import net.labymod.utils.manager.ConfigManager;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SystemUtils;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
@@ -92,7 +94,6 @@ public class nLoginAddon extends LabyModAddon {
         final JsonObject config = getConfig();
         settings = Constants.GSON_PRETTY.fromJson(config, AddonSettings.class);
 
-        /*
         if (SystemUtils.IS_OS_WINDOWS) {
             credentialsFile = new File(System.getenv("APPDATA") + File.separator + "nlogin" + File.separator + "credentials.json");
         } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_UNIX) {
@@ -100,27 +101,49 @@ public class nLoginAddon extends LabyModAddon {
         } else {
             credentialsFile = new File(FileSystemView.getFileSystemView().getDefaultDirectory(), "nlogin" + File.separator + "credentials.json");
         }
-         */
-
-        try {
-            Field f = LabyModAddon.class.getDeclaredField("configManager");
-            f.setAccessible(true);
-            ConfigManager<AddonConfig> configManager = (ConfigManager<AddonConfig>) f.get(this);
-            credentialsFile = new File(configManager.getFile().getParentFile() + File.separator + "nLogin-Addon", "credentials.json");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
 
         File parent = credentialsFile.getParentFile();
         if (!parent.exists() && !parent.mkdirs()) {
-            throw new SecurityException("Failed to create directory '" + parent.getPath() + "'!");
+            try {
+                Field f = LabyModAddon.class.getDeclaredField("configManager");
+                f.setAccessible(true);
+                ConfigManager<AddonConfig> configManager = (ConfigManager<AddonConfig>) f.get(this);
+                credentialsFile = new File(configManager.getFile().getParentFile() + File.separator + "nLogin-Addon", "credentials.json");
+                parent = credentialsFile.getParentFile();
+                if (!parent.exists() && !parent.mkdirs()) {
+                    throw new SecurityException("Failed to create directory '" + parent.getPath() + "'!");
+                }
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                return;
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return;
+            }
         }
 
         try {
             if (!credentialsFile.exists() && !credentialsFile.createNewFile()) {
-                throw new SecurityException("Failed to create file '" + credentialsFile.getPath() + "'!");
+                try {
+                    Field f = LabyModAddon.class.getDeclaredField("configManager");
+                    f.setAccessible(true);
+                    ConfigManager<AddonConfig> configManager = (ConfigManager<AddonConfig>) f.get(this);
+                    credentialsFile = new File(configManager.getFile().getParentFile() + File.separator + "nLogin-Addon", "credentials.json");
+                    parent = credentialsFile.getParentFile();
+                    if (parent.exists() || parent.mkdirs()) {
+                        if (!credentialsFile.exists() && !credentialsFile.createNewFile()) {
+                            throw new SecurityException("Failed to create file '" + credentialsFile.getPath() + "'!");
+                        }
+                    } else {
+                        throw new SecurityException("Failed to create directory '" + parent.getPath() + "'!");
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                    return;
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
