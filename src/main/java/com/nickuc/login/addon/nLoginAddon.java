@@ -20,6 +20,7 @@ import com.nickuc.login.addon.model.request.Request;
 import com.nickuc.login.addon.model.response.Response;
 import lombok.Cleanup;
 import lombok.Getter;
+import net.labymod.addon.AddonConfig;
 import net.labymod.addon.AddonLoader;
 import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
@@ -29,11 +30,11 @@ import net.labymod.settings.elements.SettingsElement;
 import net.labymod.settings.elements.StringElement;
 import net.labymod.utils.Consumer;
 import net.labymod.utils.Material;
+import net.labymod.utils.manager.ConfigManager;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.SystemUtils;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Timer;
@@ -59,7 +60,8 @@ public class nLoginAddon extends LabyModAddon {
         if (credentials != null) {
             File parent = credentialsFile.getParentFile();
 
-            if (parent.isDirectory() && parent.getName().contains("nlogin")) {
+            //if (parent.isDirectory() && parent.getName().contains("nlogin")) {
+            if (parent.isDirectory() && parent.getName().equals("nLogin-Addon")) {
                 File[] files = parent.listFiles();
                 if (files == null) return;
 
@@ -90,12 +92,25 @@ public class nLoginAddon extends LabyModAddon {
         final JsonObject config = getConfig();
         settings = Constants.GSON_PRETTY.fromJson(config, AddonSettings.class);
 
+        /*
         if (SystemUtils.IS_OS_WINDOWS) {
             credentialsFile = new File(System.getenv("APPDATA") + File.separator + "nlogin" + File.separator + "credentials.json");
         } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_UNIX) {
-            credentialsFile = new File(FileSystemView.getFileSystemView().getDefaultDirectory(), ".nlogin" + File.separator + "credentials.json");
+            credentialsFile = new File(System.getProperty("user.home"), ".nlogin" + File.separator + "credentials.json");
         } else {
             credentialsFile = new File(FileSystemView.getFileSystemView().getDefaultDirectory(), "nlogin" + File.separator + "credentials.json");
+        }
+         */
+
+        try {
+            Field f = LabyModAddon.class.getDeclaredField("configManager");
+            f.setAccessible(true);
+            ConfigManager<AddonConfig> configManager = (ConfigManager<AddonConfig>) f.get(this);
+            credentialsFile = new File(configManager.getFile().getParentFile() + File.separator + "nLogin-Addon", "credentials.json");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         File parent = credentialsFile.getParentFile();
@@ -105,7 +120,7 @@ public class nLoginAddon extends LabyModAddon {
 
         try {
             if (!credentialsFile.exists() && !credentialsFile.createNewFile()) {
-                throw new SecurityException("Failed to create file '" + parent.getPath() + "'!");
+                throw new SecurityException("Failed to create file '" + credentialsFile.getPath() + "'!");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -128,8 +143,6 @@ public class nLoginAddon extends LabyModAddon {
             return;
         }
 
-        credentials = Credentials.fromJson(Constants.GSON.fromJson(content.isEmpty() ? "{}" : content, JsonObject.class));
-
         String path = null;
         try {
             path = URLDecoder.decode(getClass().getProtectionDomain()
@@ -142,9 +155,9 @@ public class nLoginAddon extends LabyModAddon {
 
         final File addonFile = path == null ? null : new File(path);
 
-        Timer timer = new Timer("nLoginAddon$Save");
+        credentials = Credentials.fromJson(Constants.GSON.fromJson(content.isEmpty() ? "{}" : content, JsonObject.class));
 
-        // save
+        Timer timer = new Timer("nLoginAddon$Save");
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
