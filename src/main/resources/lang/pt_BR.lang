@@ -1,0 +1,12 @@
+settings.enabled.name=Ativado
+settings.sync-passwords.name=Sincronizar senhas
+settings.sync-passwords.description=Sincroniza as suas senhas de forma &acriptograda &fremotamente, com a técnica de &azero-conhecimento&f.
+settings.master-password.name=Senha mestra
+settings.master-password.description=Essa é a sua &6senha mestra&f. Se você trocar de computador, ainda poderá logar.\n&cO recurso de sincronização precisa dessa senha.
+
+in-game.registering-a-password=Registrando uma senha segura...
+in-game.sync.failed-encrypt=Falha ao encriptar: impossível sincronizar.
+in-game.sync.require-password=Falha ao logar: é necessário configurar uma senha mestra para acessar.
+in-game.sync.failed-decrypt=Falha ao decriptar: a senha mestra configurada está correta?
+in-game.sync.failed-decrypt2=Falha ao decriptar: os dados remotos estão corrompidos?
+in-game.sync.syncing=Sincronizando...

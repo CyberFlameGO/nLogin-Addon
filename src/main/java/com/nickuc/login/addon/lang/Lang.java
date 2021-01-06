@@ -27,18 +27,16 @@ public class Lang {
     @AllArgsConstructor
     public enum Type {
 
-        EN_US("en_US.lang", "en_US");
+        EN_US("en_US.lang", "en_US"),
+        PT_BR("pt_BR.lang", "pt_BR");
 
         private final String file;
         private final String locale;
 
         public static Type findByLocale(String locale) {
-            /*
             for (Type type : values()) {
-                if (type.locale.equals(locale)) return type;
+                if (type.locale.equals(locale) || locale.startsWith(type.locale.substring(0, 2))) return type;
             }
-            return null;
-             */
             return EN_US;
         }
 
