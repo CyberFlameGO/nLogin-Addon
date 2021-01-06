@@ -48,8 +48,8 @@ public class Lang {
         // settings
         ENABLED_NAME("settings.enabled.name"),
         SYNC_PASSWORDS_NAME("settings.sync-passwords.name"),
-        SYNC_PASSWORDS_DESCRIPTION("settings.master-password.description"),
-        MASTER_PASSWORD_NAME("settings.sync-passwords.name"),
+        SYNC_PASSWORDS_DESCRIPTION("settings.sync-passwords.description"),
+        MASTER_PASSWORD_NAME("settings.master-password.name"),
         MASTER_PASSWORD_DESCRIPTION("settings.master-password.description"),
 
         // in-game
