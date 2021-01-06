@@ -24,10 +24,12 @@ public class JoinEvent implements Consumer<ServerData> {
     @Override
     public void accept(ServerData serverData) {
         addon.getSession().join();
-        Credentials credentials = addon.getCredentials();
-        Credentials.User user = credentials.getUser();
-        ReadyRequest ready = new ReadyRequest(credentials.getUuid(), addon.getSettings());
-        addon.sendRequest(ready);
+        if (addon.getSettings().isEnabled()) {
+            Credentials credentials = addon.getCredentials();
+            Credentials.User user = credentials.getUser();
+            ReadyRequest ready = new ReadyRequest(credentials.getUuid(), addon.getSettings());
+            addon.sendRequest(ready);
+        }
     }
 
 }

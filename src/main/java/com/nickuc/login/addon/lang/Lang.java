@@ -48,6 +48,7 @@ public class Lang {
     public enum Message {
 
         // settings
+        ENABLED_NAME("settings.enabled.name"),
         SYNC_PASSWORDS_NAME("settings.sync-passwords.name"),
         SYNC_PASSWORDS_DESCRIPTION("settings.master-password.description"),
         MASTER_PASSWORD_NAME("settings.sync-passwords.name"),

@@ -18,7 +18,8 @@ import java.lang.reflect.Field;
 @NoArgsConstructor(access = AccessLevel.PRIVATE) @Getter @Setter
 public class AddonSettings {
 
-    private boolean syncPasswords;
+    private boolean enabled = true;
+    private boolean syncPasswords = true;
 
     public void toJson(JsonObject json) throws IllegalAccessException {
         json.entrySet().clear();

@@ -189,6 +189,14 @@ public class nLoginAddon extends LabyModAddon {
     @Override
     protected void fillSettings(final List<SettingsElement> settings) {
 
+        final BooleanElement enabledElement = new BooleanElement(Lang.Message.ENABLED_NAME.toText(), new ControlElement.IconData(Material.LEVER), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                nLoginAddon.this.settings.setEnabled(result);
+                markModified(false);
+            }
+        }, nLoginAddon.this.settings.isEnabled());
+
         final BooleanElement storePasswordElement = new BooleanElement(Lang.Message.SYNC_PASSWORDS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
@@ -207,6 +215,7 @@ public class nLoginAddon extends LabyModAddon {
         });
         masterPasswordElement.setDescriptionText(Lang.Message.MASTER_PASSWORD_DESCRIPTION.toText());
 
+        settings.add(enabledElement);
         settings.add(storePasswordElement);
         settings.add(masterPasswordElement);
     }

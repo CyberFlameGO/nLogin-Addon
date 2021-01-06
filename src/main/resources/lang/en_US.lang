@@ -1,3 +1,4 @@
+settings.enabled.name=Enabled
 settings.sync-passwords.name=Sync passwords
 settings.sync-passwords.description=Synchronizes your passwords in &aencrypted &fform with &azero knowledge &fon a remote server.
 settings.master-password.name=Master password
