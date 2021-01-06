@@ -145,8 +145,6 @@ public class nLoginAddon extends LabyModAddon {
             e.printStackTrace();
         }
 
-        final File addonFile = path == null ? null : new File(path);
-
         credentials = Credentials.fromJson(Constants.GSON.fromJson(content.isEmpty() ? "{}" : content, JsonObject.class));
 
         Timer timer = new Timer("nLoginAddon$Save");
