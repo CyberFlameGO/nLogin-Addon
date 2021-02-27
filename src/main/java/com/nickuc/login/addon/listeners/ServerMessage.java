@@ -10,7 +10,7 @@ package com.nickuc.login.addon.listeners;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.nickuc.login.addon.Constants;
-import com.nickuc.login.addon.model.request.handler.ResponseHandler;
+import com.nickuc.login.addon.handler.ResponseHandler;
 import com.nickuc.login.addon.model.response.LoginFinishResponse;
 import com.nickuc.login.addon.model.response.ReadyResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;

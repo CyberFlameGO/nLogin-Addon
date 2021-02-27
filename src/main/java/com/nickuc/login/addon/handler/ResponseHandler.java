@@ -5,7 +5,7 @@
  * https://github.com/nickuc
  */
 
-package com.nickuc.login.addon.model.request.handler;
+package com.nickuc.login.addon.handler;
 
 import com.google.gson.JsonObject;
 import com.nickuc.login.addon.Constants;
