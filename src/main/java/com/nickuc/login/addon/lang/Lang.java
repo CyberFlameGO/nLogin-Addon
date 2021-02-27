@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class Lang {
 
-    private static final Map<String, String> LANG_MAP = new HashMap<>();
+    private static final Map<String, String> LANG_MAP = new HashMap<String, String>();
 
     @AllArgsConstructor
     public enum Type {

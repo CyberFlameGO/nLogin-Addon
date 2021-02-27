@@ -83,7 +83,10 @@ public class nLoginAddon extends LabyModAddon {
                 if (!parent.exists() && !parent.mkdirs()) {
                     throw new SecurityException("Failed to create directory '" + parent.getPath() + "'!");
                 }
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                return;
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 return;
             }
@@ -104,7 +107,10 @@ public class nLoginAddon extends LabyModAddon {
                     } else {
                         throw new SecurityException("Failed to create directory '" + parent.getPath() + "'!");
                     }
-                } catch (NoSuchFieldException | IllegalAccessException e) {
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                    return;
+                } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     return;
                 }
@@ -239,7 +245,9 @@ public class nLoginAddon extends LabyModAddon {
             Response response = (Response) clasz.newInstance();
             response.read(json);
             return (T) response;
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         throw new RuntimeException("Failed to read " + clasz + ", content: " + json);

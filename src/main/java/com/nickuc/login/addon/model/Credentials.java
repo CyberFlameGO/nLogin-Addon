@@ -68,7 +68,7 @@ public class Credentials {
             masterPassword = "";
         }
 
-        List<User> users = new ArrayList<>();
+        List<User> users = new ArrayList<User>();
         if (json.has("users")) {
             JsonArray usersJson = json.getAsJsonArray("users");
             for (int i = 0; i < usersJson.size(); i++) {
@@ -155,14 +155,14 @@ public class Credentials {
         @Nullable
         public static User fromJson(JsonObject json) {
             if (json.has("username") && json.has("cryptKeys") && json.has("servers")) {
-                List<String> cryptKeys = new ArrayList<>();
+                List<String> cryptKeys = new ArrayList<String>();
                 JsonArray cryptKeysJson = json.getAsJsonArray("cryptKeys");
                 for (int i = 0; i < cryptKeysJson.size(); i++) {
                     cryptKeys.add(cryptKeysJson.get(i).getAsJsonPrimitive().getAsString());
                 }
 
                 JsonArray serversJson = json.getAsJsonArray("servers");
-                Map<String, Server> servers = new HashMap<>();
+                Map<String, Server> servers = new HashMap<String, Server>();
                 User user = new User(json.get("username").getAsString(), cryptKeys, servers);
                 for (int i = 0; i < serversJson.size(); i++) {
                     JsonObject serverJson = serversJson.get(i).getAsJsonObject();

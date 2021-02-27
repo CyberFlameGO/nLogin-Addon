@@ -12,8 +12,25 @@ import com.nickuc.login.addon.nLoginAddon;
 import lombok.RequiredArgsConstructor;
 import net.labymod.api.events.MessageSendEvent;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 @RequiredArgsConstructor
 public class ChatEvent implements MessageSendEvent {
+
+    private static final Set<String> COMMANDS = new HashSet<String>();
+
+    static {
+        COMMANDS.addAll(Arrays.asList(
+                "/login",
+                "/logar",
+                "/log",
+                "/register",
+                "/registrar",
+                "/reg"
+        ));
+    }
 
     private final nLoginAddon addon;
 
@@ -24,6 +41,14 @@ public class ChatEvent implements MessageSendEvent {
             String[] parts = message.split(" ");
             if (parts.length > 1) {
                 String command = parts[0].toLowerCase();
+
+                // switch are not supported in java 1.6
+                if (COMMANDS.contains(command)) {
+                    String password = parts[1];
+                    addon.getSession().setTmpPassword(password);
+                }
+
+                /*
                 switch (command) {
                     case "/login":
                     case "/logar":
@@ -35,6 +60,7 @@ public class ChatEvent implements MessageSendEvent {
                         addon.getSession().setTmpPassword(password);
                         break;
                 }
+                 */
             }
         }
         return false;

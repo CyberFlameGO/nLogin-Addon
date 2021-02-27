@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +27,7 @@ public class Constants {
 
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 
-    public static final Charset UTF_8 = StandardCharsets.UTF_8;
+    public static final Charset UTF_8 = Charset.forName("UTF-8");
 
     public static int DEFAULT_PASSWORD_LENGTH = 12;
     public static int USER_CRYPT_KEY_LENGTH = 192;
