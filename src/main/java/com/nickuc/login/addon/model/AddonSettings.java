@@ -20,6 +20,7 @@ public class AddonSettings {
 
     private boolean enabled = true;
     private boolean syncPasswords = true;
+    private boolean saveLogin = true;
 
     public void toJson(JsonObject json) throws IllegalAccessException {
         json.entrySet().clear();

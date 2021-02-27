@@ -36,12 +36,13 @@ import org.apache.commons.lang3.SystemUtils;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.net.URLDecoder;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class nLoginAddon extends LabyModAddon {
+
+    public static final Object LOCK = new Object();
 
     @Getter private final Session session = new Session();
     private File credentialsFile;
@@ -82,10 +83,7 @@ public class nLoginAddon extends LabyModAddon {
                 if (!parent.exists() && !parent.mkdirs()) {
                     throw new SecurityException("Failed to create directory '" + parent.getPath() + "'!");
                 }
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-                return;
-            } catch (IllegalAccessException e) {
+            } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
                 return;
             }
@@ -106,10 +104,7 @@ public class nLoginAddon extends LabyModAddon {
                     } else {
                         throw new SecurityException("Failed to create directory '" + parent.getPath() + "'!");
                     }
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                    return;
-                } catch (IllegalAccessException e) {
+                } catch (NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();
                     return;
                 }
@@ -135,16 +130,6 @@ public class nLoginAddon extends LabyModAddon {
             return;
         }
 
-        String path = null;
-        try {
-            path = URLDecoder.decode(getClass().getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .getPath(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
         credentials = Credentials.fromJson(Constants.GSON.fromJson(content.isEmpty() ? "{}" : content, JsonObject.class));
 
         Timer timer = new Timer("nLoginAddon$Save");
@@ -155,10 +140,10 @@ public class nLoginAddon extends LabyModAddon {
                     if (credentialsModified) {
                         System.out.println(Constants.PREFIX + "Saving credentials changes...");
                         try {
-                            @Cleanup PrintWriter writter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(credentialsFile), Constants.UTF_8), true);
-                            writter.print(Constants.GSON_PRETTY.toJson(credentials.toJson()));
-                            writter.flush();
-                            writter.close();
+                            @Cleanup PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(credentialsFile), Constants.UTF_8), true);
+                            writer.print(Constants.GSON_PRETTY.toJson(credentials.toJson()));
+                            writer.flush();
+                            writer.close();
                         } catch (Exception var2) {
                             var2.printStackTrace();
                         }
@@ -195,6 +180,15 @@ public class nLoginAddon extends LabyModAddon {
             }
         }, nLoginAddon.this.settings.isEnabled());
 
+        final BooleanElement saveLoginElement = new BooleanElement(Lang.Message.SAVE_LOGIN_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                nLoginAddon.this.settings.setSaveLogin(result);
+                markModified(false);
+            }
+        }, nLoginAddon.this.settings.isSaveLogin());
+        saveLoginElement.setDescriptionText(Lang.Message.SAVE_LOGIN_DESCRIPTION.toText());
+
         final BooleanElement storePasswordElement = new BooleanElement(Lang.Message.SYNC_PASSWORDS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
@@ -214,6 +208,7 @@ public class nLoginAddon extends LabyModAddon {
         masterPasswordElement.setDescriptionText(Lang.Message.MASTER_PASSWORD_DESCRIPTION.toText());
 
         settings.add(enabledElement);
+        settings.add(saveLoginElement);
         settings.add(storePasswordElement);
         settings.add(masterPasswordElement);
     }
@@ -244,9 +239,7 @@ public class nLoginAddon extends LabyModAddon {
             Response response = (Response) clasz.newInstance();
             response.read(json);
             return (T) response;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         throw new RuntimeException("Failed to read " + clasz + ", content: " + json);

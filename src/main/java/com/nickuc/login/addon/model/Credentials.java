@@ -30,7 +30,7 @@ public class Credentials {
         return getUser(LabyMod.getInstance().getPlayerName());
     }
 
-    public synchronized  User getUser(String username) {
+    public synchronized User getUser(String username) {
         for (User user : users) {
             if (user.username.equals(username)) return user;
         }
@@ -68,7 +68,7 @@ public class Credentials {
             masterPassword = "";
         }
 
-        List<User> users = new ArrayList<User>();
+        List<User> users = new ArrayList<>();
         if (json.has("users")) {
             JsonArray usersJson = json.getAsJsonArray("users");
             for (int i = 0; i < usersJson.size(); i++) {
@@ -155,14 +155,14 @@ public class Credentials {
         @Nullable
         public static User fromJson(JsonObject json) {
             if (json.has("username") && json.has("cryptKeys") && json.has("servers")) {
-                List<String> cryptKeys = new ArrayList<String>();
+                List<String> cryptKeys = new ArrayList<>();
                 JsonArray cryptKeysJson = json.getAsJsonArray("cryptKeys");
                 for (int i = 0; i < cryptKeysJson.size(); i++) {
                     cryptKeys.add(cryptKeysJson.get(i).getAsJsonPrimitive().getAsString());
                 }
 
                 JsonArray serversJson = json.getAsJsonArray("servers");
-                Map<String, Server> servers = new HashMap<String, Server>();
+                Map<String, Server> servers = new HashMap<>();
                 User user = new User(json.get("username").getAsString(), cryptKeys, servers);
                 for (int i = 0; i < serversJson.size(); i++) {
                     JsonObject serverJson = serversJson.get(i).getAsJsonObject();

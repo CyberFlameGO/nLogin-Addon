@@ -14,18 +14,18 @@ import java.security.NoSuchAlgorithmException;
 public class Sha256 {
 
     public static String hash(String content) {
-        if (content != null) {
-            try {
-                MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-                messageDigest.reset();
-                messageDigest.update(content.getBytes());
-                byte[] digest = messageDigest.digest();
-                return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1, digest));
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
+        if (content == null) {
+            throw new IllegalArgumentException("Content cannot be null!");
         }
-        return null;
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            messageDigest.reset();
+            messageDigest.update(content.getBytes());
+            byte[] digest = messageDigest.digest();
+            return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1, digest));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

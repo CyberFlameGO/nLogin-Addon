@@ -1,10 +1,13 @@
 settings.enabled.name=Enabled
+settings.save-login.name=Save logins
+settings.save-login.description=Saves the logins that were manually registered.
 settings.sync-passwords.name=Sync passwords
 settings.sync-passwords.description=Synchronizes your passwords in &aencrypted &fform with &azero knowledge &fon a remote server.
 settings.master-password.name=Master password
 settings.master-password.description=This is your &6master password&f. If you change your computer, you can still login.\n&cSync passwords resource uses this password.
 
 in-game.registering-a-password=Registering a secure password...
+in-game.registering-a-password2=Saving the account password...
 in-game.sync.failed-encrypt=Failed to encrypt: cannot sync.
 in-game.sync.require-password=Failed to login: it is necessary to configure the master password to access.
 in-game.sync.failed-decrypt=Failed to decrypt: is the master password correct?

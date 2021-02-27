@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class Lang {
 
-    private static final Map<String, String> LANG_MAP = new HashMap<String, String>();
+    private static final Map<String, String> LANG_MAP = new HashMap<>();
 
     @AllArgsConstructor
     public enum Type {
@@ -47,6 +47,8 @@ public class Lang {
 
         // settings
         ENABLED_NAME("settings.enabled.name"),
+        SAVE_LOGIN_NAME("settings.save-login.name"),
+        SAVE_LOGIN_DESCRIPTION("settings.save-login.description"),
         SYNC_PASSWORDS_NAME("settings.sync-passwords.name"),
         SYNC_PASSWORDS_DESCRIPTION("settings.sync-passwords.description"),
         MASTER_PASSWORD_NAME("settings.master-password.name"),
@@ -54,6 +56,7 @@ public class Lang {
 
         // in-game
         REGISTERING_A_PASSWORD("in-game.registering-a-password"),
+        REGISTERING_A_PASSWORD2("in-game.registering-a-password2"),
         SYNC_FAILED_ENCRYPT("in-game.sync.failed-encrypt"),
         SYNC_REQUIRE_PASSWORD("in-game.sync.require-password"),
         SYNC_FAILED_DECRYPT("in-game.sync.failed-decrypt"),
