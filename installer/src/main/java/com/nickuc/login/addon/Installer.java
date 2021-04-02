@@ -76,17 +76,8 @@ public class Installer extends JPanel {
         if (direct || JOptionPane.showConfirmDialog(null, INSTALLATION_QUESTION[lang], INSTALL_CONFIRMATION[lang], JOptionPane.YES_NO_OPTION) == 0) {
             File mcDir = getMCDir();
             if (!mcDir.exists()) {
-                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        Desktop.getDesktop().browse(new URI(DOWNLOAD_URL));
-                    } catch (IOException | URISyntaxException e) {
-                        e.printStackTrace();
-                        System.exit(1);
-                    }
-                } else {
-                    sendMessage(INSTALLATION_ERR_MINECRAFT[lang], FAILED_TO_INSTALL[lang], true);
-                    System.exit(1);
-                }
+                sendMessage(INSTALLATION_ERR_MINECRAFT[lang], FAILED_TO_INSTALL[lang], true);
+                System.exit(1);
                 return;
             }
 
