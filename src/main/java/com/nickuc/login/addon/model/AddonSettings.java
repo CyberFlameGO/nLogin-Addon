@@ -8,6 +8,7 @@
 package com.nickuc.login.addon.model;
 
 import com.google.gson.JsonObject;
+import com.nickuc.login.addon.lang.Lang;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class AddonSettings {
     private boolean enabled = true;
     private boolean syncPasswords = true;
     private boolean saveLogin = true;
+    private String language = Lang.Type.EN_US.name();
 
     public void toJson(JsonObject json) throws IllegalAccessException {
         json.entrySet().clear();

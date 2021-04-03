@@ -11,7 +11,6 @@ import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.nLoginAddon;
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
-import net.minecraft.client.Minecraft;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -97,8 +96,8 @@ public class Lang {
         return new String(b);
     }
 
-    public static void loadAll() {
-        Type type = Type.findByLocale(Minecraft.getMinecraft().gameSettings.language);
+    public static void loadAll(String locale) {
+        Type type = Type.findByLocale(locale);
         System.out.println(Constants.PREFIX + "Using the language " + type);
         try {
             @Cleanup InputStream inputStream = nLoginAddon.class.getResourceAsStream("/lang/" + type.file);

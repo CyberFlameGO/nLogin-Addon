@@ -18,15 +18,14 @@ import com.nickuc.login.addon.model.Credentials;
 import com.nickuc.login.addon.model.Session;
 import com.nickuc.login.addon.model.request.Request;
 import com.nickuc.login.addon.model.response.Response;
+import com.nickuc.login.addon.updater.Updater;
 import lombok.Cleanup;
 import lombok.Getter;
 import net.labymod.addon.AddonConfig;
 import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
-import net.labymod.settings.elements.BooleanElement;
-import net.labymod.settings.elements.ControlElement;
-import net.labymod.settings.elements.SettingsElement;
-import net.labymod.settings.elements.StringElement;
+import net.labymod.gui.elements.DropDownMenu;
+import net.labymod.settings.elements.*;
 import net.labymod.utils.Consumer;
 import net.labymod.utils.Material;
 import net.labymod.utils.manager.ConfigManager;
@@ -56,6 +55,7 @@ public class nLoginAddon extends LabyModAddon {
         eventManager.registerOnJoin(new JoinEvent(this));
         eventManager.registerOnQuit(new QuitEvent(this));
         eventManager.register(new ServerMessage(this));
+        Updater.checkForUpdates(Constants.VERSION);
     }
 
     @Override
@@ -156,6 +156,7 @@ public class nLoginAddon extends LabyModAddon {
                         nLoginAddon.this.credentialsModified = false;
                     }
                     if (settingsModified) {
+                        Lang.loadAll(settings.getLanguage());
                         try {
                             settings.toJson(config);
                         } catch (IllegalAccessException e) {
@@ -172,7 +173,7 @@ public class nLoginAddon extends LabyModAddon {
             }
         }, 1000, 1000);
 
-        Lang.loadAll();
+        Lang.loadAll(settings.getLanguage());
     }
 
     @Override
@@ -213,6 +214,35 @@ public class nLoginAddon extends LabyModAddon {
         });
         masterPasswordElement.setDescriptionText(Lang.Message.MASTER_PASSWORD_DESCRIPTION.toText());
 
+        Lang.Type[] langTypes0 = Lang.Type.values();
+        String[] langTypes = new String[langTypes0.length];
+        for (int i = 0; i < langTypes0.length; i++) {
+            langTypes[i] = langTypes0[i].name();
+        }
+
+        final DropDownMenu<String> langSelectorDropDownMenu = new DropDownMenu<String>("Language", 0, 0, 0, 0).fill(langTypes);
+        DropDownElement<String> langSelectorDropDown = new DropDownElement<String>("Language", langSelectorDropDownMenu);
+        langSelectorDropDownMenu.setSelected(nLoginAddon.this.settings.getLanguage());
+
+        langSelectorDropDown.setChangeListener(new Consumer<String>() {
+            @Override
+            public void accept(String type) {
+                nLoginAddon.this.settings.setLanguage(type);
+                markModified(true);
+            }
+        });
+
+        /*
+        langSelectorDropDownMenu.setEntryDrawer(new DropDownMenu.DropDownEntryDrawer() {
+            @Override
+            public void draw(Object object, int x, int y, String trimmedEntry) {
+                String entry = object.toString().toLowerCase();
+                LabyMod.getInstance().getDrawUtils().drawString(LanguageManager.translate(entry), x, y);
+            }
+        });
+         */
+
+        settings.add(langSelectorDropDown);
         settings.add(enabledElement);
         settings.add(saveLoginElement);
         settings.add(storePasswordElement);
