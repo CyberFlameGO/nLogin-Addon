@@ -8,11 +8,8 @@
 package com.nickuc.login.addon;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Locale;
 
 public class Installer extends JPanel {
@@ -121,6 +118,16 @@ public class Installer extends JPanel {
             sendMessage(String.format(INSTALLATION_ERR_MKDIR[lang], "1.8"), FAILED_TO_INSTALL[lang], true);
             System.exit(1);
             return null;
+        }
+
+        File[] files = addons.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                String name = f.getName();
+                if (name.contains("nLogin-Addon") && name.endsWith(".jar")) {
+                    f.delete();
+                }
+            }
         }
 
         File addonFile = new File(addons, "nLogin-Addon.jar");
