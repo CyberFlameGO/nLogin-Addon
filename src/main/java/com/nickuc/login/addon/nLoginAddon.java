@@ -60,7 +60,6 @@ public class nLoginAddon extends LabyModAddon {
 
     @Override
     public void loadConfig() {
-
         final JsonObject config = getConfig();
         settings = Constants.GSON_PRETTY.fromJson(config, AddonSettings.class);
 
@@ -156,12 +155,12 @@ public class nLoginAddon extends LabyModAddon {
                         nLoginAddon.this.credentialsModified = false;
                     }
                     if (settingsModified) {
-                        Lang.loadAll(settings.getLanguage());
                         try {
                             settings.toJson(config);
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         }
+                        Lang.setLang(Lang.Type.findByLocale(settings.getLanguage()));
                         saveConfig();
                         nLoginAddon.this.settingsModified = false;
                     }
@@ -173,7 +172,7 @@ public class nLoginAddon extends LabyModAddon {
             }
         }, 1000, 1000);
 
-        Lang.loadAll(settings.getLanguage());
+        Lang.loadAll();
     }
 
     @Override

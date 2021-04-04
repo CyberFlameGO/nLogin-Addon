@@ -11,6 +11,8 @@ import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.nLoginAddon;
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,19 +24,21 @@ import java.util.Map;
 public class Lang {
 
     private static final Map<String, String> LANG_MAP = new HashMap<String, String>();
+    @Getter @Setter private static Type lang = Type.EN_US;
 
     @AllArgsConstructor
     public enum Type {
 
-        EN_US("en_US.lang", "en_US"),
-        PT_BR("pt_BR.lang", "pt_BR");
+        EN_US("en_US.lang", "EN_US"),
+        PT_BR("pt_BR.lang", "PT_BR");
 
         private final String file;
         private final String locale;
 
         public static Type findByLocale(String locale) {
             for (Type type : values()) {
-                if (type.locale.equals(locale) || locale.startsWith(type.locale.substring(0, 2))) return type;
+                String localeUpper = locale.toUpperCase();
+                if (type.locale.equals(localeUpper) || localeUpper.startsWith(type.locale.substring(0, 2))) return type;
             }
             return EN_US;
         }
@@ -65,7 +69,8 @@ public class Lang {
         private final String key;
 
         public String toText() {
-            return LANG_MAP.get(key);
+            String prefixKey = lang.name().toLowerCase() + "_";
+            return LANG_MAP.get(prefixKey + key);
         }
 
     }
@@ -96,27 +101,28 @@ public class Lang {
         return new String(b);
     }
 
-    public static void loadAll(String locale) {
-        Type type = Type.findByLocale(locale);
-        System.out.println(Constants.PREFIX + "Using the language " + type);
-        try {
-            @Cleanup InputStream inputStream = nLoginAddon.class.getResourceAsStream("/lang/" + type.file);
-            @Cleanup InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Constants.UTF_8);
-            @Cleanup BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty()) continue;
-                if (!line.contains("=")) continue;
+    public static void loadAll() {
+        for (Type type : Type.values()) {
+            System.out.println(Constants.PREFIX + "Loading the language " + type);
+            try {
+                @Cleanup InputStream inputStream = nLoginAddon.class.getResourceAsStream("/lang/" + type.file);
+                @Cleanup InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Constants.UTF_8);
+                @Cleanup BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String line;
+                String keyPrefix = type.name().toLowerCase() + "_";
+                while ((line = bufferedReader.readLine()) != null) {
+                    line = line.trim();
+                    if (line.isEmpty()) continue;
+                    if (!line.contains("=")) continue;
 
-                String[] parts = line.split("=");
-                if (parts.length != 2) continue;
+                    String[] parts = line.split("=");
+                    if (parts.length != 2) continue;
 
-                LANG_MAP.put(parts[0].toLowerCase(), translateAlternateColorCodes(parts[1]).replace("\\n", "\n"));
+                    LANG_MAP.put(keyPrefix + parts[0].toLowerCase(), translateAlternateColorCodes(parts[1]).replace("\\n", "\n"));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
-
 }
