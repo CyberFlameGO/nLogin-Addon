@@ -173,6 +173,7 @@ public class nLoginAddon extends LabyModAddon {
         }, 1000, 1000);
 
         Lang.loadAll();
+        Lang.setLang(Lang.Type.findByLocale(settings.getLanguage()));
     }
 
     @Override
