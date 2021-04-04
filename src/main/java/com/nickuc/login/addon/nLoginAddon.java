@@ -228,7 +228,7 @@ public class nLoginAddon extends LabyModAddon {
             @Override
             public void accept(String type) {
                 nLoginAddon.this.settings.setLanguage(type);
-                markModified(true);
+                markModified(false);
             }
         });
 

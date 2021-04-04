@@ -34,7 +34,7 @@ public class AddonSettings {
             if (type.isAssignableFrom(boolean.class)) {
                 json.addProperty(key, (Boolean) value);
             } else if (type.isAssignableFrom(String.class)) {
-                json.addProperty(key, value.toString());
+                json.addProperty(key, String.valueOf(value));
             }
         }
     }
