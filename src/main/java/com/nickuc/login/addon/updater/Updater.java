@@ -83,6 +83,7 @@ public class Updater {
         int index = 0;
         while (true) {
             if (addonFile.exists() && !addonFile.delete()) {
+                addonFile.deleteOnExit();
                 addonFile = new File(addons, "nLogin-Addon-" + index++ + ".tmp");
             } else {
                 break;
