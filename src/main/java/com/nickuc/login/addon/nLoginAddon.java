@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.nickuc.login.addon.lang.Lang;
 import com.nickuc.login.addon.listeners.JoinEvent;
+import com.nickuc.login.addon.listeners.MessageReceived;
 import com.nickuc.login.addon.listeners.QuitEvent;
 import com.nickuc.login.addon.listeners.ServerMessage;
 import com.nickuc.login.addon.model.AddonSettings;
@@ -55,6 +56,7 @@ public class nLoginAddon extends LabyModAddon {
         eventManager.registerOnJoin(new JoinEvent(this));
         eventManager.registerOnQuit(new QuitEvent(this));
         eventManager.register(new ServerMessage(this));
+        eventManager.register(new MessageReceived(this));
         Updater.checkForUpdates(Constants.VERSION);
     }
 
@@ -187,6 +189,15 @@ public class nLoginAddon extends LabyModAddon {
             }
         }, nLoginAddon.this.settings.isEnabled());
 
+        final BooleanElement securityWarningsElement = new BooleanElement(Lang.Message.SECURITY_WARNINGS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                nLoginAddon.this.settings.setSecurityWarnings(result);
+                markModified(false);
+            }
+        }, nLoginAddon.this.settings.isSecurityWarnings());
+        securityWarningsElement.setDescriptionText(Lang.Message.SECURITY_WARNINGS_DESCRIPTION.toText());
+
         final BooleanElement saveLoginElement = new BooleanElement(Lang.Message.SAVE_LOGIN_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
@@ -244,6 +255,7 @@ public class nLoginAddon extends LabyModAddon {
 
         settings.add(langSelectorDropDown);
         settings.add(enabledElement);
+        settings.add(securityWarningsElement);
         settings.add(saveLoginElement);
         settings.add(storePasswordElement);
         settings.add(masterPasswordElement);

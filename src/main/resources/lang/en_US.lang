@@ -5,6 +5,8 @@ settings.sync-passwords.name=Sync passwords
 settings.sync-passwords.description=Synchronizes your passwords in &aencrypted &fform with &azero knowledge &fon a remote server.
 settings.master-password.name=Master password
 settings.master-password.description=This is your &6master password&f. If you change your computer, you can still login.\n&cSync passwords resource uses this password.
+settings.security-warnings.name=Security warnings
+settings.security-warnings.name=It sends security alerts when entering servers that may be insecure.
 
 in-game.registering-a-password=Registering a secure password...
 in-game.registering-a-password2=Saving the account password...
@@ -13,3 +15,7 @@ in-game.sync.require-password=Failed to login: it is necessary to configure the 
 in-game.sync.failed-decrypt=Failed to decrypt: is the master password correct?
 in-game.sync.failed-decrypt2=Failed to decrypt: is the remote data corrupted?
 in-game.sync.syncing=Syncing...
+in-game.status.message2=&cThis server probably does not steal your passwords, but uses a weak encryption system.
+in-game.status.message3=&cThis server can steal your passwords, but uses a secure encryption system.
+in-game.status.message4=&4This server can steal your passwords and uses insecure encryption.
+in-game.status.unknown=&7This server may not protect your &aprivacy&7.

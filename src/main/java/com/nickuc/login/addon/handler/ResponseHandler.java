@@ -39,7 +39,9 @@ public class ResponseHandler {
                 }
 
                 synchronized (Constants.LOCK) {
-                    if (!LabyMod.getInstance().isInGame()) return;
+                    if (!LabyMod.getInstance().isInGame()) {
+                        return;
+                    }
 
                     final Credentials credentials = addon.getCredentials();
                     final Credentials.User user = credentials.getUser();
@@ -50,6 +52,18 @@ public class ResponseHandler {
                     session.setChecksum(checksum);
                     String serverUuid = packet.getServerUuid();
                     session.setServerUuid(serverUuid);
+
+                    switch (packet.getStatus()) {
+                        case 2:
+                            LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_MESSAGE2.toText());
+                            break;
+                        case 3:
+                            LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_MESSAGE3.toText());
+                            break;
+                        case 4:
+                            LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_MESSAGE4.toText());
+                            break;
+                    }
 
                     String message;
                     boolean syncPasswords = addon.getSettings().isSyncPasswords();

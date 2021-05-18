@@ -19,6 +19,7 @@ public class ReadyResponse implements Response {
 
     private String serverUuid;
     private int maxDataLength;
+    private int status = -1;
 
     // client
     private boolean registered;
@@ -29,6 +30,9 @@ public class ReadyResponse implements Response {
     public void read(JsonObject json) {
         serverUuid = json.get("uuid").getAsString();
         maxDataLength = json.get("maxDataLength").getAsInt();
+        if (json.has("status")) {
+            status = json.get("status").getAsInt();
+        }
 
         JsonObject clientJson = json.getAsJsonObject("client");
         registered = clientJson.get("registered").getAsBoolean();

@@ -15,6 +15,8 @@ public class Session {
 
     private boolean active;
     @Setter private boolean requireSync;
+    @Setter private boolean usingNLogin;
+    @Setter private boolean unsafeServerWarn;
     private boolean authenticated;
     @Setter private Credentials.Server server;
     @Setter private String serverUuid;
@@ -29,6 +31,8 @@ public class Session {
         active = false;
         authenticated = false;
         requireSync = false;
+        usingNLogin = false;
+        unsafeServerWarn = false;
         server = null;
         serverUuid = null;
         checksum = null;

@@ -56,6 +56,8 @@ public class Lang {
         SYNC_PASSWORDS_DESCRIPTION("settings.sync-passwords.description"),
         MASTER_PASSWORD_NAME("settings.master-password.name"),
         MASTER_PASSWORD_DESCRIPTION("settings.master-password.description"),
+        SECURITY_WARNINGS_NAME("settings.security-warnings.name"),
+        SECURITY_WARNINGS_DESCRIPTION("settings.security-warnings.description"),
 
         // in-game
         REGISTERING_A_PASSWORD("in-game.registering-a-password"),
@@ -64,7 +66,11 @@ public class Lang {
         SYNC_REQUIRE_PASSWORD("in-game.sync.require-password"),
         SYNC_FAILED_DECRYPT("in-game.sync.failed-decrypt"),
         SYNC_FAILED_DECRYPT2("in-game.sync.failed-decrypt2"),
-        SYNC_SYNCING("in-game.sync.syncing");
+        SYNC_SYNCING("in-game.sync.syncing"),
+        STATUS_MESSAGE2("in-game.status.message2"),
+        STATUS_MESSAGE3("in-game.status.message3"),
+        STATUS_MESSAGE4("in-game.status.message4"),
+        STATUS_UNKNOWN("in-game.status.unknown");
 
         private final String key;
 

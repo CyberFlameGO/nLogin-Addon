@@ -24,7 +24,7 @@ public class Constants {
     public static final String DEFAULT_TITLE = "nLogin Addon";
     public static final String NLOGIN_SUBCHANNEL = "nlogin-addon";
     public static final String PREFIX = "[nLoginAddon] ";
-    public static final String VERSION = "1.1";
+    public static final String VERSION = "1.2";
 
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 

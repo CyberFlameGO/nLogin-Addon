@@ -20,8 +20,9 @@ import java.lang.reflect.Field;
 public class AddonSettings {
 
     private boolean enabled = true;
-    private boolean syncPasswords = true;
+    private boolean securityWarnings = true;
     private boolean saveLogin = true;
+    private boolean syncPasswords = true;
     private String language = Lang.Type.EN_US.name();
 
     public void toJson(JsonObject json) throws IllegalAccessException {

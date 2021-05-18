@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.handler.ResponseHandler;
+import com.nickuc.login.addon.model.Session;
 import com.nickuc.login.addon.model.response.LoginFinishResponse;
 import com.nickuc.login.addon.model.response.ReadyResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;
@@ -32,6 +33,12 @@ public class ServerMessage implements ServerMessageEvent {
             if (!json.has("id")) return;
 
             int id = json.get("id").getAsInt();
+
+            Session session = addon.getSession();
+            if (session.isActive()) {
+                session.setUsingNLogin(true);
+            }
+
             switch (id) {
                 case 0x0:
                     final ReadyResponse readyResponse = addon.readResponse(jsonElement, ReadyResponse.class);

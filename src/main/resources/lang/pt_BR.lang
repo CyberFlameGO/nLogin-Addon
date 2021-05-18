@@ -5,6 +5,8 @@ settings.sync-passwords.name=Sincronizar senhas
 settings.sync-passwords.description=Sincroniza as suas senhas de forma &acriptograda &fremotamente, com a técnica de &azero-conhecimento&f.
 settings.master-password.name=Senha mestra
 settings.master-password.description=Essa é a sua &6senha mestra&f. Se você trocar de computador, ainda poderá logar.\n&cO recurso de sincronização precisa dessa senha.
+settings.security-warnings.name=Alertas de segurança
+settings.security-warnings.name=Envia alertas de segurança ao entrar em servidores que podem ser inseguros.
 
 in-game.registering-a-password=Registrando uma senha segura...
 in-game.registering-a-password2=Salvando a senha da conta...
@@ -13,3 +15,7 @@ in-game.sync.require-password=Falha ao logar: é necessário configurar uma senh
 in-game.sync.failed-decrypt=Falha ao decriptar: a senha mestra configurada está correta?
 in-game.sync.failed-decrypt2=Falha ao decriptar: os dados remotos estão corrompidos?
 in-game.sync.syncing=Sincronizando...
+in-game.status.message2=&cEste servidor provavelmente não rouba suas senhas, mas utiliza um sistema de criptografia fraco.
+in-game.status.message3=&cEste servidor pode roubar suas senhas, mas utiliza um sistema de criptografia seguro.
+in-game.status.message4=&4Este servidor pode roubar suas senhas e utiliza sistema de criptografia inseguro.
+in-game.status.unknown=&7Este servidor pode não proteger sua &aprivacidade&7.
