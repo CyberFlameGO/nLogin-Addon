@@ -6,7 +6,7 @@ settings.sync-passwords.description=Sincroniza as suas senhas de forma &acriptog
 settings.master-password.name=Senha mestra
 settings.master-password.description=Essa é a sua &6senha mestra&f. Se você trocar de computador, ainda poderá logar.\n&cO recurso de sincronização precisa dessa senha.
 settings.security-warnings.name=Alertas de segurança
-settings.security-warnings.name=Envia alertas de segurança ao entrar em servidores que podem ser inseguros.
+settings.security-warnings.description=Envia alertas de segurança ao entrar em servidores que podem ser inseguros.
 
 in-game.registering-a-password=Registrando uma senha segura...
 in-game.registering-a-password2=Salvando a senha da conta...

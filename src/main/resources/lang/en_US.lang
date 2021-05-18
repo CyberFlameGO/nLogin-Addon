@@ -6,7 +6,7 @@ settings.sync-passwords.description=Synchronizes your passwords in &aencrypted &
 settings.master-password.name=Master password
 settings.master-password.description=This is your &6master password&f. If you change your computer, you can still login.\n&cSync passwords resource uses this password.
 settings.security-warnings.name=Security warnings
-settings.security-warnings.name=It sends security alerts when entering servers that may be insecure.
+settings.security-warnings.description=It sends security alerts when entering servers that may be insecure.
 
 in-game.registering-a-password=Registering a secure password...
 in-game.registering-a-password2=Saving the account password...
