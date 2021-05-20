@@ -22,26 +22,28 @@ public class MessageReceived implements MessageReceiveEvent {
 
     @Override
     public boolean onReceive(String formatted, String unformatted) {
-        Session session = addon.getSession();
-        if (!session.isUnsafeServerWarn() && unformatted.contains("/login ") || unformatted.contains("/logar ") || unformatted.contains("/register ") || unformatted.contains("/registrar ")) {
-            Constants.EXECUTOR_SERVICE.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(2000L);
-                        synchronized (Constants.LOCK) {
-                            Session session = addon.getSession();
-                            if (!session.isUnsafeServerWarn() && session.isActive() && !session.isUsingNLogin()) {
-                                LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_UNKNOWN.toText());
-                                LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_UNKNOWN.toText()); ;
-                                session.setUnsafeServerWarn(true);
+        if (addon.getSettings().isEnabled()) {
+            Session session = addon.getSession();
+            if (!session.isUnsafeServerWarn() && unformatted.contains("/login ") || unformatted.contains("/logar ") || unformatted.contains("/register ") || unformatted.contains("/registrar ")) {
+                Constants.EXECUTOR_SERVICE.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(2000L);
+                            synchronized (Constants.LOCK) {
+                                Session session = addon.getSession();
+                                if (!session.isUnsafeServerWarn() && session.isActive() && !session.isUsingNLogin()) {
+                                    LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_UNKNOWN.toText());
+                                    LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_UNKNOWN.toText()); ;
+                                    session.setUnsafeServerWarn(true);
+                                }
                             }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
-                }
-            });
+                });
+            }
         }
         return false;
     }
