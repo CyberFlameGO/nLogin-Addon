@@ -26,6 +26,7 @@ import net.labymod.addon.AddonConfig;
 import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
 import net.labymod.gui.elements.DropDownMenu;
+import net.labymod.main.LabyMod;
 import net.labymod.settings.elements.*;
 import net.labymod.utils.Consumer;
 import net.labymod.utils.Material;
@@ -39,15 +40,19 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class nLoginAddon extends LabyModAddon {
 
     public static final Object LOCK = new Object();
 
-    @Getter private final Session session = new Session();
+    @Getter
+    private final Session session = new Session();
     private File credentialsFile;
-    @Getter private Credentials credentials;
-    @Getter private AddonSettings settings;
+    @Getter
+    private Credentials credentials;
+    @Getter
+    private AddonSettings settings;
     private boolean credentialsModified, settingsModified;
 
     @Override
@@ -58,6 +63,19 @@ public class nLoginAddon extends LabyModAddon {
         eventManager.register(new ServerMessage(this));
         eventManager.register(new MessageReceived(this));
         Updater.checkForUpdates(Constants.VERSION);
+        if (Updater.isUpdateAvailable()) {
+            Timer timer = new Timer("nLoginAddon$UpdateWarning");
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (Constants.LOCK) {
+                        if (LabyMod.getInstance().isInGame()) {
+                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, String.format(Lang.Message.UPDATE_AVAILABLE.toText(), Constants.VERSION, Updater.getNewerVersion()));
+                        }
+                    }
+                }
+            }, TimeUnit.SECONDS.toMillis(30), TimeUnit.MINUTES.toMillis(30));
+        }
     }
 
     @Override
@@ -172,7 +190,7 @@ public class nLoginAddon extends LabyModAddon {
                     cancel();
                 }
             }
-        }, 1000, 1000);
+        }, TimeUnit.SECONDS.toMillis(1), TimeUnit.SECONDS.toMillis(1));
 
         Lang.loadAll();
         Lang.setLang(Lang.Type.findByLocale(settings.getLanguage()));

@@ -18,7 +18,9 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 
-@RequiredArgsConstructor @Getter @Accessors(chain = true, fluent = true)
+@RequiredArgsConstructor
+@Getter
+@Accessors(chain = true, fluent = true)
 public final class Http {
 
     private static final String USER_AGENT = "nLogin-Addon (+https://github.com/nickuc/nLogin-Addon)";
@@ -60,8 +62,8 @@ public final class Http {
         @Cleanup BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Constants.UTF_8));
         StringBuilder response = new StringBuilder();
         int cp;
-        while((cp = bufferedReader.read()) != -1) {
-            response.append((char)cp);
+        while ((cp = bufferedReader.read()) != -1) {
+            response.append((char) cp);
         }
         return response.toString();
     }

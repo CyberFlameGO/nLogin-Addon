@@ -6,6 +6,7 @@
  */
 
 package com.nickuc.login.addon.utils.crypt;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

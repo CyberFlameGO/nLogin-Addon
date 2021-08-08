@@ -12,7 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@NoArgsConstructor @Getter @ToString
+@NoArgsConstructor
+@Getter
+@ToString
 public class SyncResponse implements Response {
 
     private static final int ID = 0x1;

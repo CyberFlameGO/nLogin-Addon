@@ -8,6 +8,9 @@ settings.master-password.description=This is your &6master password&f. If you ch
 settings.security-warnings.name=Security warnings
 settings.security-warnings.description=It sends security alerts when entering servers that may be insecure.
 
+in-game.invalid-server-uuid=The server ID is invalid.
+in-game.invalid-server-pbkey=The server's public key is invalid.
+in-game.invalid-server-signature=The server's signature is invalid.
 in-game.registering-a-password=Registering a secure password...
 in-game.registering-a-password2=Saving the account password...
 in-game.sync.failed-encrypt=Failed to encrypt: cannot sync.
@@ -19,3 +22,4 @@ in-game.status.message2=Information from this server:\n&fAnti-Logger: &a✔ &f| 
 in-game.status.message3=Information from this server:\n&fAnti-Logger: &c✗ &f| Encryption: &a✔
 in-game.status.message4=Information from this server:\n&fAnti-Logger: &c✗ &f| Encryption: &c✗
 in-game.status.unknown=Enter unique passwords on this server to avoid leaks.
+in-game.update-available=A new version is available.\n&b%s &f-> &b%s

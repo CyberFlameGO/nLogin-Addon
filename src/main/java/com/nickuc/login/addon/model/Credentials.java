@@ -11,19 +11,25 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.nickuc.login.addon.utils.SafeGenerator;
+import com.nickuc.login.addon.utils.crypt.RSA;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.labymod.main.LabyMod;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.annotation.Nullable;
+import java.security.PublicKey;
 import java.util.*;
 
 @AllArgsConstructor
 public class Credentials {
 
-    @Getter private final String uuid;
-    @Getter @Setter private String masterPassword;
+    @Getter
+    private final String uuid;
+    @Getter
+    @Setter
+    private String masterPassword;
     private final List<User> users;
 
     public synchronized User getUser() {
@@ -84,7 +90,8 @@ public class Credentials {
 
     public static class User {
 
-        @Getter private final String username;
+        @Getter
+        private final String username;
         private final List<String> cryptKeys;
         private final Map<String, Server> servers;
 
@@ -112,12 +119,15 @@ public class Credentials {
             if (!cryptKeys.contains(key)) cryptKeys.add(key);
         }
 
-        public synchronized Server updateServer(String uuid, String password) {
-            Server server  = getServer(uuid);
+        public synchronized Server updateServer(String uuid, @Nullable PublicKey publicKey, String password) {
+            Server server = getServer(uuid);
             if (server != null) {
                 server.password = password;
+                if (server.publicKey == null) {
+                    server.publicKey = publicKey;
+                }
             } else {
-                servers.put(uuid, new Server(uuid, password));
+                servers.put(uuid, new Server(uuid, publicKey, password));
             }
             return server;
         }
@@ -178,15 +188,21 @@ public class Credentials {
 
     }
 
-    @AllArgsConstructor @Getter
+    @AllArgsConstructor
+    @Getter
     public static class Server {
 
         private final String uuid;
+        @Nullable
+        private PublicKey publicKey;
         private String password;
 
         public JsonObject toJson() {
             JsonObject json = new JsonObject();
             json.addProperty("uuid", uuid);
+            if (publicKey != null) {
+                json.addProperty("publicKey", Base64.encodeBase64String(publicKey.getEncoded()));
+            }
             json.addProperty("password", password);
             return json;
         }
@@ -196,11 +212,12 @@ public class Credentials {
             if (json.has("uuid") && json.has("password")) {
                 String uuid = json.get("uuid").getAsString();
                 String password = json.get("password").getAsString();
-                return new Server(uuid, password);
+                PublicKey publicKey = json.has("publicKey") ? RSA.getPublicKeyFromBytes(Base64.decodeBase64(json.get("publicKey").getAsString())) : null;
+                return new Server(uuid, publicKey, password);
             }
             return null;
         }
-        
+
     }
 
 }

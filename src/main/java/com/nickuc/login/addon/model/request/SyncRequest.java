@@ -11,7 +11,8 @@ import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
-@AllArgsConstructor @ToString
+@AllArgsConstructor
+@ToString
 public class SyncRequest implements Request {
 
     private static final int ID = 0x2;

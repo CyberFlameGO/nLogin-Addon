@@ -24,7 +24,9 @@ import java.util.Map;
 public class Lang {
 
     private static final Map<String, String> LANG_MAP = new HashMap<String, String>();
-    @Getter @Setter private static Type lang = Type.EN_US;
+    @Getter
+    @Setter
+    private static Type lang = Type.EN_US;
 
     @AllArgsConstructor
     public enum Type {
@@ -60,6 +62,9 @@ public class Lang {
         SECURITY_WARNINGS_DESCRIPTION("settings.security-warnings.description"),
 
         // in-game
+        INVALID_SERVER_UUID("in-game.invalid-server-uuid"),
+        INVALID_SERVER_PUBLIC_KEY("in-game.invalid-server-pbkey"),
+        INVALID_SERVER_SIGNATURE("in-game.invalid-server-signature"),
         REGISTERING_A_PASSWORD("in-game.registering-a-password"),
         REGISTERING_A_PASSWORD2("in-game.registering-a-password2"),
         SYNC_FAILED_ENCRYPT("in-game.sync.failed-encrypt"),
@@ -70,7 +75,8 @@ public class Lang {
         STATUS_MESSAGE2("in-game.status.message2"),
         STATUS_MESSAGE3("in-game.status.message3"),
         STATUS_MESSAGE4("in-game.status.message4"),
-        STATUS_UNKNOWN("in-game.status.unknown");
+        STATUS_UNKNOWN("in-game.status.unknown"),
+        UPDATE_AVAILABLE("in-game.update-available");
 
         private final String key;
 
@@ -87,7 +93,7 @@ public class Lang {
 
     /**
      * This method was taken from Bukkit-API (class: org.bukkit.ChatColor)
-     *
+     * <p>
      * Translates a string using an alternate color code character into a
      * string that uses the internal ChatColor.COLOR_CODE color code
      * character. The alternate color code character will only be replaced if
@@ -99,9 +105,9 @@ public class Lang {
     private static String translateAlternateColorCodes(String textToTranslate) {
         char[] b = textToTranslate.toCharArray();
         for (int i = 0; i < b.length - 1; i++) {
-            if (b[i] == ALT_COLOR_CHAR && CHARACTERS.indexOf(b[i+1]) > -1) {
+            if (b[i] == ALT_COLOR_CHAR && CHARACTERS.indexOf(b[i + 1]) > -1) {
                 b[i] = COLOR_CODE;
-                b[i+1] = Character.toLowerCase(b[i+1]);
+                b[i + 1] = Character.toLowerCase(b[i + 1]);
             }
         }
         return new String(b);

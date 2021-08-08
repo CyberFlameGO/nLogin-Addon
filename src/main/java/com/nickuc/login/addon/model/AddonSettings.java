@@ -16,7 +16,9 @@ import lombok.Setter;
 
 import java.lang.reflect.Field;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE) @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+@Setter
 public class AddonSettings {
 
     private boolean enabled = true;

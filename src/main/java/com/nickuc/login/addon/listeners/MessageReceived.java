@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import net.labymod.api.events.MessageReceiveEvent;
 import net.labymod.main.LabyMod;
 
+import java.util.concurrent.TimeUnit;
+
 @RequiredArgsConstructor
 public class MessageReceived implements MessageReceiveEvent {
 
@@ -29,7 +31,7 @@ public class MessageReceived implements MessageReceiveEvent {
                     @Override
                     public void run() {
                         try {
-                            Thread.sleep(2000L);
+                            Thread.sleep(TimeUnit.SECONDS.toMillis(2));
                             synchronized (Constants.LOCK) {
                                 Session session = addon.getSession();
                                 if (!session.isUnsafeServerWarn() && session.isActive() && !session.isUsingNLogin()) {

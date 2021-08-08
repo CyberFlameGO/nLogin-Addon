@@ -12,7 +12,7 @@ import java.security.GeneralSecurityException;
 /**
  * @author mkyong
  * @link https://mkyong.com/java/java-aes-encryption-and-decryption/
- *
+ * <p>
  * AES-GCM inputs - 12 bytes IV, need the same IV and secret keys for encryption and decryption.
  * <p>
  * The output consist of iv, password's salt, encrypted content and auth tag in the following format:
@@ -29,8 +29,7 @@ public class AesGcm {
     private static final int
             TAG_LENGTH_BIT = 128, // must be one of {128, 120, 112, 104, 96}
             IV_LENGTH_BYTE = 12,
-            SALT_LENGTH_BYTE = 16
-    ;
+            SALT_LENGTH_BYTE = 16;
 
     public static String encrypt(String content, String password) throws GeneralSecurityException {
         return encryptBytes(content.getBytes(Constants.UTF_8), password);

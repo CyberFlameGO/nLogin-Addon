@@ -9,6 +9,7 @@ package com.nickuc.login.addon.updater;
 
 import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.updater.http.Http;
+import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +21,10 @@ public class Updater {
 
     private static final String CHECK_URL = "https://api.github.com/repos/nickuc/nLogin-Addon/releases/latest";
     private static final String DOWNLOAD_URL = "https://github.com/nickuc/nLogin-Addon/releases/latest/download/nLogin-Addon.jar";
+    @Getter
     private static boolean updateAvailable;
+    @Getter
+    private static String newerVersion;
 
     public static void checkForUpdates(final String currentVersion) {
         String tagName = null;
@@ -29,7 +33,8 @@ public class Updater {
 
             // avoid use Google Gson to avoid problems with older versions.
             if (result.contains("\"tag_name\":\"")) {
-                tagName = result.split("\"tag_name\":\"")[1];;
+                tagName = result.split("\"tag_name\":\"")[1];
+                ;
                 if (tagName.contains("\",")) {
                     tagName = tagName.split("\",")[0];
                 }
@@ -38,8 +43,9 @@ public class Updater {
             if (tagName == null) {
                 System.err.println(Constants.PREFIX + "Failed to find new updates: invalid response.");
             } else {
-                if (updateAvailable = !("v" + currentVersion).equals(tagName)) {
-                    System.out.println(Constants.PREFIX + "A new version of nLogin-Addon is available (" + currentVersion + " -> " + tagName + ").");
+                newerVersion = tagName;
+                if (updateAvailable = !("v" + currentVersion).equals(newerVersion)) {
+                    System.out.println(Constants.PREFIX + "A new version of nLogin-Addon is available (" + currentVersion + " -> " + newerVersion + ").");
 
                     final File labyModFolder = getLMDir();
                     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

@@ -19,6 +19,13 @@ public class SafeGenerator {
             NUMBERS = "0123456789".toCharArray(),
             SYMBOLS = "^!@#$%&*".toCharArray();
 
+    public static byte[] generateRSAChallenge() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] random = new byte[Constants.RSA_CHALLENGE_LENGTH];
+        secureRandom.nextBytes(random);
+        return random;
+    }
+
     public static String generatePassword() {
         int length = Constants.DEFAULT_PASSWORD_LENGTH;
         if (length < 6 || length > 15) {
@@ -35,7 +42,7 @@ public class SafeGenerator {
         mix(ALL, LETTERS, NUMBERS, SYMBOLS);
 
         for (int i = 0; i < length; i++) {
-            builder.append(ALL[(int)(random.nextDouble() * ALL.length)]);
+            builder.append(ALL[(int) (random.nextDouble() * ALL.length)]);
         }
         for (int i = 0; i < length; i++) {
             char c = builder.charAt(i);
@@ -58,13 +65,13 @@ public class SafeGenerator {
             }
             if (!symbols) {
                 int restrictedPos = (int) (Math.random() * length);
-                builder.setCharAt(restrictedPos, NUMBERS[(int)(random.nextDouble() * NUMBERS.length)]);
+                builder.setCharAt(restrictedPos, NUMBERS[(int) (random.nextDouble() * NUMBERS.length)]);
                 while (true) {
                     int position = (int) (Math.random() * length);
                     if (position == restrictedPos) {
                         continue;
                     }
-                    builder.setCharAt(position, SYMBOLS[(int)(random.nextDouble() * SYMBOLS.length)]);
+                    builder.setCharAt(position, SYMBOLS[(int) (random.nextDouble() * SYMBOLS.length)]);
                     break;
                 }
             }

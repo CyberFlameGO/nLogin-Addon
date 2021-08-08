@@ -11,7 +11,8 @@ import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
-@AllArgsConstructor @ToString
+@AllArgsConstructor
+@ToString
 public class UpdateRequest implements Request {
 
     private static final int ID = 0x1;
@@ -22,7 +23,8 @@ public class UpdateRequest implements Request {
 
     @Override
     public void write(JsonObject json) {
-        json.addProperty("encrypted", cryptKey + ";" + data);
+        String encrypted = cryptKey + ";" + data;
+        json.addProperty("encrypted", encrypted);
         json.addProperty("checksum", checksum);
     }
 

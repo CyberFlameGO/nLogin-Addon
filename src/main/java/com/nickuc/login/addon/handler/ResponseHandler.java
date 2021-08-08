@@ -20,11 +20,14 @@ import com.nickuc.login.addon.nLoginAddon;
 import com.nickuc.login.addon.sync.Synchronization;
 import com.nickuc.login.addon.utils.SafeGenerator;
 import com.nickuc.login.addon.utils.crypt.AesGcm;
+import com.nickuc.login.addon.utils.crypt.RSA;
 import com.nickuc.login.addon.utils.hash.Sha256;
 import net.labymod.core.LabyModCore;
 import net.labymod.main.LabyMod;
 
 import java.security.GeneralSecurityException;
+import java.security.PublicKey;
+import java.util.Arrays;
 
 public class ResponseHandler {
 
@@ -43,16 +46,29 @@ public class ResponseHandler {
                         return;
                     }
 
+                    String serverUuid = packet.getServerUuid();
+                    if (serverUuid.isEmpty() || !Constants.UUID_PATTERN.matcher(serverUuid).matches()) {
+                        LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_UUID.toText());
+                        return;
+                    }
+
                     final Credentials credentials = addon.getCredentials();
                     final Credentials.User user = credentials.getUser();
                     final Credentials.Server server;
 
                     Session session = addon.getSession();
-                    String checksum = packet.getChecksum();
-                    session.setChecksum(checksum);
-                    String serverUuid = packet.getServerUuid();
                     session.setServerUuid(serverUuid);
 
+                    String checksum = packet.getChecksum();
+                    session.setChecksum(checksum);
+
+                    PublicKey serverPublicKey = packet.getPublicKey();
+                    session.setServerPublicKey(serverPublicKey);
+
+                    byte[] serverSignature = packet.getSignature();
+                    session.setServerSignature(serverSignature);
+
+                    // server status message
                     boolean statusSent = false;
                     switch (packet.getStatus()) {
                         case 2:
@@ -88,10 +104,34 @@ public class ResponseHandler {
                             return;
                         }
 
+                        // signature check
+                        PublicKey publicKey = server.getPublicKey();
+                        byte[] clientRsaChallenge = session.getRsaChallenge();
+                        if (publicKey != null && clientRsaChallenge != null) {
+                            if (serverPublicKey == null) {
+                                System.err.println(Constants.PREFIX + "The server did not send its public key.");
+                                LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                                return;
+                            }
+
+                            if (!Arrays.equals(publicKey.getEncoded(), serverPublicKey.getEncoded())) {
+                                System.err.println(Constants.PREFIX + "The public key of the remote server is not the same as the stored one.");
+                                LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                                return;
+                            }
+
+                            byte[] decrypt = RSA.decrypt(publicKey, serverSignature);
+                            if (!Arrays.equals(decrypt, clientRsaChallenge)) {
+                                System.err.println(Constants.PREFIX + "The bytes of the challenge are not the same as in cryptography.");
+                                LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                                return;
+                            }
+                        }
+
                         message = "/login " + server.getPassword();
                     } else {
                         String securePassword = SafeGenerator.generatePassword();
-                        server = user.updateServer(serverUuid, securePassword);
+                        server = user.updateServer(serverUuid, serverPublicKey, securePassword);
                         addon.markModified(true);
                         message = "/register " + securePassword + " " + securePassword;
                         if (!statusSent) {
@@ -112,7 +152,7 @@ public class ResponseHandler {
                                 requireSync = !Sha256.hash(Sha256.hash(masterPassword + user.getPrimaryCryptKey())).equals(checksum);
                             }
 
-                            System.out.println("Sync required: " + requireSync);
+                            System.out.println(Constants.PREFIX + "Sync required: " + requireSync);
                             session.setRequireSync(requireSync);
                         }
                     }
@@ -206,11 +246,12 @@ public class ResponseHandler {
                 }
             } else {
                 String serverUuid = session.getServerUuid();
+                PublicKey serverPublicKey = session.getServerPublicKey();
                 String tmpPassword = session.getTmpPassword();
                 if (serverUuid != null && tmpPassword != null) {
                     Credentials credentials = addon.getCredentials();
                     Credentials.User user = credentials.getUser();
-                    server = user.updateServer(serverUuid, tmpPassword);
+                    server = user.updateServer(serverUuid, serverPublicKey, tmpPassword);
                     addon.markModified(true);
                     LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.REGISTERING_A_PASSWORD2.toText());
                     Synchronization.sendUpdateRequest(addon, server);

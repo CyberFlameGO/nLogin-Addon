@@ -13,6 +13,7 @@ import com.google.gson.GsonBuilder;
 import java.nio.charset.Charset;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 public class Constants {
 
@@ -29,8 +30,10 @@ public class Constants {
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 
     public static final Charset UTF_8 = Charset.forName("UTF-8");
+    public static final Pattern UUID_PATTERN = Pattern.compile("\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12}\\b");
 
-    public static int DEFAULT_PASSWORD_LENGTH = 12;
-    public static int USER_CRYPT_KEY_LENGTH = 192;
+    public static final int DEFAULT_PASSWORD_LENGTH = 12;
+    public static final int USER_CRYPT_KEY_LENGTH = 192;
+    public static final int RSA_CHALLENGE_LENGTH = 4;
 
 }
