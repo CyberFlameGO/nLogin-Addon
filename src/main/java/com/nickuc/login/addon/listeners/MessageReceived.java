@@ -24,7 +24,7 @@ public class MessageReceived implements MessageReceiveEvent {
     public boolean onReceive(String formatted, String unformatted) {
         if (addon.getSettings().isEnabled()) {
             Session session = addon.getSession();
-            if (!session.isUnsafeServerWarn() && unformatted.contains("/login ") || unformatted.contains("/logar ") || unformatted.contains("/register ") || unformatted.contains("/registrar ")) {
+            if (!session.isUnsafeServerWarn() && (unformatted.contains("/register ") || unformatted.contains("/registrar "))) {
                 Constants.EXECUTOR_SERVICE.submit(new Runnable() {
                     @Override
                     public void run() {
@@ -34,7 +34,6 @@ public class MessageReceived implements MessageReceiveEvent {
                                 Session session = addon.getSession();
                                 if (!session.isUnsafeServerWarn() && session.isActive() && !session.isUsingNLogin()) {
                                     LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_UNKNOWN.toText());
-                                    LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_UNKNOWN.toText()); ;
                                     session.setUnsafeServerWarn(true);
                                 }
                             }

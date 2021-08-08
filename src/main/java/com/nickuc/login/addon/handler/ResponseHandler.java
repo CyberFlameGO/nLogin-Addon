@@ -53,15 +53,19 @@ public class ResponseHandler {
                     String serverUuid = packet.getServerUuid();
                     session.setServerUuid(serverUuid);
 
+                    boolean statusSent = false;
                     switch (packet.getStatus()) {
                         case 2:
-                            LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_MESSAGE2.toText());
+                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_MESSAGE2.toText());
+                            statusSent = true;
                             break;
                         case 3:
-                            LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_MESSAGE3.toText());
+                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_MESSAGE3.toText());
+                            statusSent = true;
                             break;
                         case 4:
-                            LabyMod.getInstance().displayMessageInChat(Lang.Message.STATUS_MESSAGE4.toText());
+                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_MESSAGE4.toText());
+                            statusSent = true;
                             break;
                     }
 
@@ -76,7 +80,9 @@ public class ResponseHandler {
                                     addon.sendRequest(new SyncRequest());
                                 } else {
                                     LabyMod.getInstance().displayMessageInChat("§4[" + Constants.DEFAULT_TITLE + "] §c" + Lang.Message.SYNC_REQUIRE_PASSWORD.toText());
-                                    LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.SYNC_REQUIRE_PASSWORD.toText());
+                                    if (!statusSent) {
+                                        LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.SYNC_REQUIRE_PASSWORD.toText());
+                                    }
                                 }
                             }
                             return;
@@ -88,7 +94,9 @@ public class ResponseHandler {
                         server = user.updateServer(serverUuid, securePassword);
                         addon.markModified(true);
                         message = "/register " + securePassword + " " + securePassword;
-                        LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.REGISTERING_A_PASSWORD.toText());
+                        if (!statusSent) {
+                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.REGISTERING_A_PASSWORD.toText());
+                        }
                     }
 
                     session.setServer(server);
