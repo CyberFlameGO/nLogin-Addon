@@ -64,10 +64,10 @@ public class SafeGenerator {
                 }
             }
             if (!symbols) {
-                int restrictedPos = (int) (Math.random() * length);
+                int restrictedPos = (int) (random.nextDouble() * length);
                 builder.setCharAt(restrictedPos, NUMBERS[(int) (random.nextDouble() * NUMBERS.length)]);
                 while (true) {
-                    int position = (int) (Math.random() * length);
+                    int position = (int) (random.nextDouble() * length);
                     if (position == restrictedPos) {
                         continue;
                     }
