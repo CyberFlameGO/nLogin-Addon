@@ -70,7 +70,7 @@ public class nLoginAddon extends LabyModAddon {
                 public void run() {
                     synchronized (Constants.LOCK) {
                         if (LabyMod.getInstance().isInGame()) {
-                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, String.format(Lang.Message.UPDATE_AVAILABLE.toText(), Constants.VERSION, Updater.getNewerVersion()));
+                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, String.format(Lang.Message.UPDATE_AVAILABLE.toText(), "v" + Constants.VERSION, Updater.getNewerVersion()));
                         }
                     }
                 }
