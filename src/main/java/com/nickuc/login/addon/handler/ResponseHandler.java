@@ -13,7 +13,7 @@ import com.nickuc.login.addon.lang.Lang;
 import com.nickuc.login.addon.model.Credentials;
 import com.nickuc.login.addon.model.Session;
 import com.nickuc.login.addon.model.request.SyncRequest;
-import com.nickuc.login.addon.model.response.LoginFinishResponse;
+import com.nickuc.login.addon.model.response.ServerStatusResponse;
 import com.nickuc.login.addon.model.response.ReadyResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;
 import com.nickuc.login.addon.nLoginAddon;
@@ -234,28 +234,45 @@ public class ResponseHandler {
         });
     }
 
-    public static void handle0x2(final nLoginAddon addon, final LoginFinishResponse packet) {
-        Session session = addon.getSession();
-        if (session.isActive()) {
-            session.authenticate();
+    public static void handle0x2(final nLoginAddon addon, final ServerStatusResponse packet) {
+        switch (packet.getCode()) {
+            case ServerStatusResponse.LOGIN_SUCCESSFUL: {
+                Session session = addon.getSession();
+                if (session.isActive()) {
+                    session.authenticate();
 
-            Credentials.Server server = session.getServer();
-            if (server != null) {
-                if (session.isRequireSync()) {
-                    Synchronization.sendUpdateRequest(addon, server);
+                    Credentials.Server server = session.getServer();
+                    if (server != null) {
+                        if (session.isRequireSync()) {
+                            Synchronization.sendUpdateRequest(addon, server);
+                        }
+                    } else {
+                        String serverUuid = session.getServerUuid();
+                        PublicKey serverPublicKey = session.getServerPublicKey();
+                        String tmpPassword = session.getTmpPassword();
+                        if (serverUuid != null && tmpPassword != null) {
+                            Credentials credentials = addon.getCredentials();
+                            Credentials.User user = credentials.getUser();
+                            server = user.updateServer(serverUuid, serverPublicKey, tmpPassword);
+                            addon.markModified(true);
+                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.REGISTERING_A_PASSWORD2.toText());
+                            Synchronization.sendUpdateRequest(addon, server);
+                        }
+                    }
                 }
-            } else {
-                String serverUuid = session.getServerUuid();
-                PublicKey serverPublicKey = session.getServerPublicKey();
-                String tmpPassword = session.getTmpPassword();
-                if (serverUuid != null && tmpPassword != null) {
-                    Credentials credentials = addon.getCredentials();
-                    Credentials.User user = credentials.getUser();
-                    server = user.updateServer(serverUuid, serverPublicKey, tmpPassword);
-                    addon.markModified(true);
-                    LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.REGISTERING_A_PASSWORD2.toText());
-                    Synchronization.sendUpdateRequest(addon, server);
-                }
+                break;
+            }
+            case ServerStatusResponse.RSA_CHALLENGE_REJECTED: {
+                System.err.println(Constants.PREFIX + "RSA challenge rejected.");
+                break;
+            }
+            case ServerStatusResponse.SYNC_REQUEST_REJECTED: {
+                System.err.println(Constants.PREFIX + "Sync request rejected.");
+                break;
+            }
+            case ServerStatusResponse.CHECKSUM_REJECTED: {
+                System.err.println(Constants.PREFIX + "Checksum rejected.");
+                break;
             }
         }
     }

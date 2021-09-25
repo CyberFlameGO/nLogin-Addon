@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.handler.ResponseHandler;
 import com.nickuc.login.addon.model.Session;
-import com.nickuc.login.addon.model.response.LoginFinishResponse;
+import com.nickuc.login.addon.model.response.ServerStatusResponse;
 import com.nickuc.login.addon.model.response.ReadyResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;
 import com.nickuc.login.addon.nLoginAddon;
@@ -51,7 +51,7 @@ public class ServerMessage implements ServerMessageEvent {
                     break;
 
                 case 0x2:
-                    final LoginFinishResponse loginFinishResponse = addon.readResponse(jsonElement, LoginFinishResponse.class);
+                    final ServerStatusResponse loginFinishResponse = addon.readResponse(jsonElement, ServerStatusResponse.class);
                     ResponseHandler.handle0x2(addon, loginFinishResponse);
                     break;
             }
