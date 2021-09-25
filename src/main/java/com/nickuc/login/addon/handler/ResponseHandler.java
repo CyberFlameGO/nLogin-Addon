@@ -111,12 +111,18 @@ public class ResponseHandler {
                             if (serverPublicKey == null) {
                                 System.err.println(Constants.PREFIX + "The server did not send its public key.");
                                 LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                                if (addon.getSettings().isDebug()) {
+                                    LabyMod.getInstance().displayMessageInChat("§3The server did not send its public key.");
+                                }
                                 return;
                             }
 
                             if (!Arrays.equals(publicKey.getEncoded(), serverPublicKey.getEncoded())) {
                                 System.err.println(Constants.PREFIX + "The public key of the remote server is not the same as the stored one.");
                                 LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                                if (addon.getSettings().isDebug()) {
+                                    LabyMod.getInstance().displayMessageInChat("§3The public key of the remote server is not the same as the stored one.");
+                                }
                                 return;
                             }
 
@@ -124,6 +130,9 @@ public class ResponseHandler {
                             if (!Arrays.equals(decrypt, clientRsaChallenge)) {
                                 System.err.println(Constants.PREFIX + "The bytes of the challenge are not the same as in cryptography.");
                                 LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                                if (addon.getSettings().isDebug()) {
+                                    LabyMod.getInstance().displayMessageInChat("§3The bytes of the challenge are not the same as in cryptography.");
+                                }
                                 return;
                             }
                         }
@@ -142,6 +151,9 @@ public class ResponseHandler {
                     session.setServer(server);
 
                     System.out.println(Constants.PREFIX + "Sending '" + message + "'...");
+                    if (addon.getSettings().isDebug()) {
+                        LabyMod.getInstance().displayMessageInChat("§3Sending '" + message + "'...");
+                    }
                     LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
 
                     if (syncPasswords) {
@@ -264,14 +276,23 @@ public class ResponseHandler {
             }
             case ServerStatusResponse.RSA_CHALLENGE_REJECTED: {
                 System.err.println(Constants.PREFIX + "RSA challenge rejected.");
+                if (addon.getSettings().isDebug()) {
+                    LabyMod.getInstance().displayMessageInChat("§3RSA challenge rejected.");
+                }
                 break;
             }
             case ServerStatusResponse.SYNC_REQUEST_REJECTED: {
                 System.err.println(Constants.PREFIX + "Sync request rejected.");
+                if (addon.getSettings().isDebug()) {
+                    LabyMod.getInstance().displayMessageInChat("§3Sync request rejected.");
+                }
                 break;
             }
             case ServerStatusResponse.CHECKSUM_REJECTED: {
                 System.err.println(Constants.PREFIX + "Checksum rejected.");
+                if (addon.getSettings().isDebug()) {
+                    LabyMod.getInstance().displayMessageInChat("§3Checksum rejected.");
+                }
                 break;
             }
         }

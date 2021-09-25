@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 public class AddonSettings {
 
     private boolean enabled = true;
+    private boolean debug = false;
     private boolean securityWarnings = true;
     private boolean saveLogin = true;
     private boolean syncPasswords = true;

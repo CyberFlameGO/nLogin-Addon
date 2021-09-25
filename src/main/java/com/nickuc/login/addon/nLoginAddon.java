@@ -207,6 +207,15 @@ public class nLoginAddon extends LabyModAddon {
             }
         }, nLoginAddon.this.settings.isEnabled());
 
+        final BooleanElement debugElement = new BooleanElement(Lang.Message.DEBUG_NAME.toText(), new ControlElement.IconData(Material.COMMAND), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                nLoginAddon.this.settings.setDebug(result);
+                markModified(false);
+            }
+        }, nLoginAddon.this.settings.isDebug());
+        debugElement.setDescriptionText(Lang.Message.DEBUG_DESCRIPTION.toText());
+
         final BooleanElement securityWarningsElement = new BooleanElement(Lang.Message.SECURITY_WARNINGS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
@@ -273,6 +282,7 @@ public class nLoginAddon extends LabyModAddon {
 
         settings.add(langSelectorDropDown);
         settings.add(enabledElement);
+        settings.add(debugElement);
         settings.add(securityWarningsElement);
         settings.add(saveLoginElement);
         settings.add(storePasswordElement);

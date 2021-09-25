@@ -18,6 +18,7 @@ import com.nickuc.login.addon.model.response.SyncResponse;
 import com.nickuc.login.addon.nLoginAddon;
 import lombok.AllArgsConstructor;
 import net.labymod.api.events.ServerMessageEvent;
+import net.labymod.main.LabyMod;
 
 @AllArgsConstructor
 public class ServerMessage implements ServerMessageEvent {
@@ -37,6 +38,10 @@ public class ServerMessage implements ServerMessageEvent {
             Session session = addon.getSession();
             if (session.isActive()) {
                 session.setUsingNLogin(true);
+            }
+
+            if (addon.getSettings().isDebug()) {
+                LabyMod.getInstance().displayMessageInChat("§3Packet with id 0x" + Integer.toHexString(id) + " received.");
             }
 
             switch (id) {

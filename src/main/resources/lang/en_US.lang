@@ -1,4 +1,6 @@
 settings.enabled.name=Enabled
+settings.debug.name=Debug
+settings.debug.description=Enables developer mode.
 settings.save-login.name=Save logins
 settings.save-login.description=Saves the logins that were manually registered.
 settings.sync-passwords.name=Sync passwords

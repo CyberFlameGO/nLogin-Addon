@@ -52,6 +52,8 @@ public class Lang {
 
         // settings
         ENABLED_NAME("settings.enabled.name"),
+        DEBUG_NAME("settings.debug.name"),
+        DEBUG_DESCRIPTION("settings.debug.description"),
         SAVE_LOGIN_NAME("settings.save-login.name"),
         SAVE_LOGIN_DESCRIPTION("settings.save-login.description"),
         SYNC_PASSWORDS_NAME("settings.sync-passwords.name"),
