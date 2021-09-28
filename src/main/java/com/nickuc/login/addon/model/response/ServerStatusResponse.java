@@ -10,7 +10,6 @@ package com.nickuc.login.addon.model.response;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @NoArgsConstructor

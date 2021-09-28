@@ -20,17 +20,20 @@ import com.nickuc.login.addon.model.Session;
 import com.nickuc.login.addon.model.request.Request;
 import com.nickuc.login.addon.model.response.Response;
 import com.nickuc.login.addon.updater.Updater;
+import io.netty.buffer.Unpooled;
 import lombok.Cleanup;
 import lombok.Getter;
 import net.labymod.addon.AddonConfig;
 import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
+import net.labymod.core.LabyModCore;
 import net.labymod.gui.elements.DropDownMenu;
 import net.labymod.main.LabyMod;
 import net.labymod.settings.elements.*;
 import net.labymod.utils.Consumer;
 import net.labymod.utils.Material;
 import net.labymod.utils.manager.ConfigManager;
+import net.minecraft.network.PacketBuffer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -46,7 +49,6 @@ public class nLoginAddon extends LabyModAddon {
 
     public static final Object LOCK = new Object();
 
-    @Getter
     private final Session session = new Session();
     private File credentialsFile;
     @Getter
@@ -68,11 +70,7 @@ public class nLoginAddon extends LabyModAddon {
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    synchronized (Constants.LOCK) {
-                        if (LabyMod.getInstance().isInGame()) {
-                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, String.format(Lang.Message.UPDATE_AVAILABLE.toText(), "v" + Constants.VERSION, Updater.getNewerVersion()));
-                        }
-                    }
+                    sendNotification(String.format(Lang.Message.UPDATE_AVAILABLE.toText(), "v" + Constants.VERSION, Updater.getNewerVersion()));
                 }
             }, TimeUnit.SECONDS.toMillis(30), TimeUnit.MINUTES.toMillis(30));
         }
@@ -289,6 +287,10 @@ public class nLoginAddon extends LabyModAddon {
         settings.add(masterPasswordElement);
     }
 
+    public synchronized Session getSession() {
+        return session;
+    }
+
     public void markModified(boolean credentials) {
         if (credentials) {
             credentialsModified = true;
@@ -298,10 +300,33 @@ public class nLoginAddon extends LabyModAddon {
     }
 
     public void sendRequest(Request request) {
-        JsonObject json = new JsonObject();
-        json.addProperty("id", request.getId());
-        request.write(json);
-        getApi().sendJsonMessageToServer(Constants.NLOGIN_SUBCHANNEL, json);
+        synchronized (Constants.LOCK) {
+            JsonObject json = new JsonObject();
+            json.addProperty("id", request.getId());
+            request.write(json);
+            //getApi().sendJsonMessageToServer(Constants.NLOGIN_SUBCHANNEL, json);
+
+            String messageKey = Constants.NLOGIN_SUBCHANNEL;
+            String message = json.toString();
+
+            PacketBuffer packetBuffer = new PacketBuffer(Unpooled.buffer());
+            packetBuffer.writeString(messageKey);
+            packetBuffer.writeString(message);
+            System.out.println(Constants.PREFIX + messageKey + ": " + message);
+            LabyModCore.getMinecraft().sendPluginMessage("LMC", packetBuffer);
+        }
+    }
+
+    public void sendMessage(String message) {
+        synchronized (Constants.LOCK) {
+            LabyMod.getInstance().displayMessageInChat(message);
+        }
+    }
+
+    public void sendNotification(String message) {
+        synchronized (Constants.LOCK) {
+            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, message);
+        }
     }
 
     public <T> T readResponse(JsonElement element, Class<T> clasz) {

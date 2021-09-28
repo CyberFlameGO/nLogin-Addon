@@ -13,7 +13,6 @@ import com.nickuc.login.addon.model.Session;
 import com.nickuc.login.addon.nLoginAddon;
 import lombok.RequiredArgsConstructor;
 import net.labymod.api.events.MessageReceiveEvent;
-import net.labymod.main.LabyMod;
 
 import java.util.concurrent.TimeUnit;
 
@@ -32,12 +31,10 @@ public class MessageReceived implements MessageReceiveEvent {
                     public void run() {
                         try {
                             Thread.sleep(TimeUnit.SECONDS.toMillis(2));
-                            synchronized (Constants.LOCK) {
-                                Session session = addon.getSession();
-                                if (!session.isUnsafeServerWarn() && session.isActive() && !session.isUsingNLogin()) {
-                                    LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_UNKNOWN.toText());
-                                    session.setUnsafeServerWarn(true);
-                                }
+                            Session session = addon.getSession();
+                            if (!session.isUnsafeServerWarn() && session.isActive() && !session.isUsingNLogin()) {
+                                addon.sendNotification(Lang.Message.STATUS_UNKNOWN.toText());
+                                session.setUnsafeServerWarn(true);
                             }
                         } catch (InterruptedException e) {
                             e.printStackTrace();

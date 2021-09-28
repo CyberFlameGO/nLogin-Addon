@@ -39,6 +39,7 @@ public class Session {
     private String tmpPassword;
 
     public void join() {
+        quit();
         active = true;
     }
 

@@ -12,13 +12,12 @@ import com.google.gson.JsonObject;
 import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.handler.ResponseHandler;
 import com.nickuc.login.addon.model.Session;
-import com.nickuc.login.addon.model.response.ServerStatusResponse;
 import com.nickuc.login.addon.model.response.ReadyResponse;
+import com.nickuc.login.addon.model.response.ServerStatusResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;
 import com.nickuc.login.addon.nLoginAddon;
 import lombok.AllArgsConstructor;
 import net.labymod.api.events.ServerMessageEvent;
-import net.labymod.main.LabyMod;
 
 @AllArgsConstructor
 public class ServerMessage implements ServerMessageEvent {
@@ -26,14 +25,14 @@ public class ServerMessage implements ServerMessageEvent {
     private final nLoginAddon addon;
 
     @Override
-    public void onServerMessage(String subchannel, JsonElement jsonElement) {
+    public void onServerMessage(String subchannel, final JsonElement jsonElement) {
         if (subchannel.equals(Constants.NLOGIN_SUBCHANNEL)) { // is our message
             if (!addon.getSettings().isEnabled()) return;
 
             JsonObject json = jsonElement.getAsJsonObject();
             if (!json.has("id")) return;
 
-            int id = json.get("id").getAsInt();
+            final int id = json.get("id").getAsInt();
 
             Session session = addon.getSession();
             if (session.isActive()) {
@@ -41,25 +40,30 @@ public class ServerMessage implements ServerMessageEvent {
             }
 
             if (addon.getSettings().isDebug()) {
-                LabyMod.getInstance().displayMessageInChat("§3Packet with id 0x" + Integer.toHexString(id) + " received.");
+                addon.sendMessage("§3Packet with id 0x" + Integer.toHexString(id) + " received.");
             }
 
-            switch (id) {
-                case 0x0:
-                    final ReadyResponse readyResponse = addon.readResponse(jsonElement, ReadyResponse.class);
-                    ResponseHandler.handle0x0(addon, readyResponse);
-                    break;
+            Constants.EXECUTOR_SERVICE.submit(new Runnable() {
+                @Override
+                public void run() {
+                    switch (id) {
+                        case 0x0:
+                            final ReadyResponse readyResponse = addon.readResponse(jsonElement, ReadyResponse.class);
+                            ResponseHandler.handle0x0(addon, readyResponse);
+                            break;
 
-                case 0x1:
-                    final SyncResponse syncResponse = addon.readResponse(jsonElement, SyncResponse.class);
-                    ResponseHandler.handle0x1(addon, syncResponse);
-                    break;
+                        case 0x1:
+                            final SyncResponse syncResponse = addon.readResponse(jsonElement, SyncResponse.class);
+                            ResponseHandler.handle0x1(addon, syncResponse);
+                            break;
 
-                case 0x2:
-                    final ServerStatusResponse loginFinishResponse = addon.readResponse(jsonElement, ServerStatusResponse.class);
-                    ResponseHandler.handle0x2(addon, loginFinishResponse);
-                    break;
-            }
+                        case 0x2:
+                            final ServerStatusResponse loginFinishResponse = addon.readResponse(jsonElement, ServerStatusResponse.class);
+                            ResponseHandler.handle0x2(addon, loginFinishResponse);
+                            break;
+                    }
+                }
+            });
         }
     }
 

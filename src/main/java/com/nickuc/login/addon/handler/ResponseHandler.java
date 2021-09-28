@@ -13,8 +13,8 @@ import com.nickuc.login.addon.lang.Lang;
 import com.nickuc.login.addon.model.Credentials;
 import com.nickuc.login.addon.model.Session;
 import com.nickuc.login.addon.model.request.SyncRequest;
-import com.nickuc.login.addon.model.response.ServerStatusResponse;
 import com.nickuc.login.addon.model.response.ReadyResponse;
+import com.nickuc.login.addon.model.response.ServerStatusResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;
 import com.nickuc.login.addon.nLoginAddon;
 import com.nickuc.login.addon.sync.Synchronization;
@@ -32,218 +32,218 @@ import java.util.Arrays;
 public class ResponseHandler {
 
     public static void handle0x0(final nLoginAddon addon, final ReadyResponse packet) {
-        Constants.EXECUTOR_SERVICE.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                synchronized (Constants.LOCK) {
-                    if (!LabyMod.getInstance().isInGame()) {
-                        return;
-                    }
-
-                    String serverUuid = packet.getServerUuid();
-                    if (serverUuid.isEmpty() || !Constants.UUID_PATTERN.matcher(serverUuid).matches()) {
-                        LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_UUID.toText());
-                        return;
-                    }
-
-                    final Credentials credentials = addon.getCredentials();
-                    final Credentials.User user = credentials.getUser();
-                    final Credentials.Server server;
-
-                    Session session = addon.getSession();
-                    session.setServerUuid(serverUuid);
-
-                    String checksum = packet.getChecksum();
-                    session.setChecksum(checksum);
-
-                    PublicKey serverPublicKey = packet.getPublicKey();
-                    session.setServerPublicKey(serverPublicKey);
-
-                    byte[] serverSignature = packet.getSignature();
-                    session.setServerSignature(serverSignature);
-
-                    // server status message
-                    boolean statusSent = false;
-                    switch (packet.getStatus()) {
-                        case 2:
-                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_MESSAGE2.toText());
-                            statusSent = true;
-                            break;
-                        case 3:
-                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_MESSAGE3.toText());
-                            statusSent = true;
-                            break;
-                        case 4:
-                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.STATUS_MESSAGE4.toText());
-                            statusSent = true;
-                            break;
-                    }
-
-                    String message;
-                    boolean syncPasswords = addon.getSettings().isSyncPasswords();
-                    if (packet.isRegistered()) {
-
-                        server = user.getServer(serverUuid);
-                        if (server == null) {
-                            if (syncPasswords) {
-                                if (!credentials.getMasterPassword().isEmpty()) {
-                                    addon.sendRequest(new SyncRequest());
-                                } else {
-                                    LabyMod.getInstance().displayMessageInChat("§4[" + Constants.DEFAULT_TITLE + "] §c" + Lang.Message.SYNC_REQUIRE_PASSWORD.toText());
-                                    if (!statusSent) {
-                                        LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.SYNC_REQUIRE_PASSWORD.toText());
-                                    }
-                                }
-                            }
-                            return;
-                        }
-
-                        // signature check
-                        PublicKey publicKey = server.getPublicKey();
-                        byte[] clientRsaChallenge = session.getRsaChallenge();
-                        if (publicKey != null && clientRsaChallenge != null) {
-                            if (serverPublicKey == null) {
-                                System.err.println(Constants.PREFIX + "The server did not send its public key.");
-                                LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
-                                if (addon.getSettings().isDebug()) {
-                                    LabyMod.getInstance().displayMessageInChat("§3The server did not send its public key.");
-                                }
-                                return;
-                            }
-
-                            if (!Arrays.equals(publicKey.getEncoded(), serverPublicKey.getEncoded())) {
-                                System.err.println(Constants.PREFIX + "The public key of the remote server is not the same as the stored one.");
-                                LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
-                                if (addon.getSettings().isDebug()) {
-                                    LabyMod.getInstance().displayMessageInChat("§3The public key of the remote server is not the same as the stored one.");
-                                }
-                                return;
-                            }
-
-                            byte[] decrypt = RSA.decrypt(publicKey, serverSignature);
-                            if (!Arrays.equals(decrypt, clientRsaChallenge)) {
-                                System.err.println(Constants.PREFIX + "The bytes of the challenge are not the same as in cryptography.");
-                                LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.INVALID_SERVER_SIGNATURE.toText());
-                                if (addon.getSettings().isDebug()) {
-                                    LabyMod.getInstance().displayMessageInChat("§3The bytes of the challenge are not the same as in cryptography.");
-                                }
-                                return;
-                            }
-                        }
-
-                        message = "/login " + server.getPassword();
-                    } else {
-                        String securePassword = SafeGenerator.generatePassword();
-                        server = user.updateServer(serverUuid, serverPublicKey, securePassword);
-                        addon.markModified(true);
-                        message = "/register " + securePassword + " " + securePassword;
-                        if (!statusSent) {
-                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.REGISTERING_A_PASSWORD.toText());
-                        }
-                    }
-
-                    session.setServer(server);
-
-                    System.out.println(Constants.PREFIX + "Sending '" + message + "'...");
-                    if (addon.getSettings().isDebug()) {
-                        LabyMod.getInstance().displayMessageInChat("§3Sending '" + message + "'...");
-                    }
-                    LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
-
-                    if (syncPasswords) {
-                        String masterPassword = credentials.getMasterPassword();
-                        if (!masterPassword.isEmpty()) {
-                            boolean requireSync = packet.isRequireSync();
-                            if (!requireSync) {
-                                requireSync = !Sha256.hash(Sha256.hash(masterPassword + user.getPrimaryCryptKey())).equals(checksum);
-                            }
-
-                            System.out.println(Constants.PREFIX + "Sync required: " + requireSync);
-                            session.setRequireSync(requireSync);
-                        }
-                    }
-                }
+        synchronized (Constants.LOCK) {
+            if (!LabyMod.getInstance().isInGame()) {
+                return;
             }
-        });
-    }
 
-    public static void handle0x1(final nLoginAddon addon, final SyncResponse packet) {
-        Constants.EXECUTOR_SERVICE.submit(new Runnable() {
-            @Override
-            public void run() {
-                final Credentials credentials = addon.getCredentials();
-                final Credentials.User user = credentials.getUser();
+            String serverUuid = packet.getServerUuid();
+            if (serverUuid.isEmpty() || !Constants.UUID_PATTERN.matcher(serverUuid).matches()) {
+                addon.sendNotification(Lang.Message.INVALID_SERVER_UUID.toText());
+                return;
+            }
 
-                String masterPassword = credentials.getMasterPassword();
-                String cryptKey = user.getPrimaryCryptKey();
-                String checksum = addon.getSession().getChecksum();
-                if (!Sha256.hash(Sha256.hash(cryptKey + masterPassword)).equals(checksum)) {
-                    boolean detected = false;
-                    for (String ck : user.getCryptKeys()) {
-                        if (ck.equals(cryptKey)) continue;
+            final Credentials credentials = addon.getCredentials();
+            final Credentials.User user = credentials.getUser();
+            final Credentials.Server server;
 
-                        if (Sha256.hash(Sha256.hash(ck + masterPassword)).equals(checksum)) {
-                            detected = true;
-                            cryptKey = ck;
-                            break;
-                        }
-                    }
-                    if (!detected) {
-                        try {
-                            String responseCryptKey = packet.getCryptKey();
-                            cryptKey = AesGcm.decrypt(responseCryptKey, masterPassword);
-                        } catch (GeneralSecurityException e) {
-                            e.printStackTrace();
-                            synchronized (Constants.LOCK) {
-                                LabyMod.getInstance().displayMessageInChat("§4[" + Constants.DEFAULT_TITLE + "] §c" + Lang.Message.SYNC_FAILED_DECRYPT.toText());
-                                LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.SYNC_FAILED_DECRYPT.toText());
+            Session session = addon.getSession();
+            session.setServerUuid(serverUuid);
+
+            String checksum = packet.getChecksum();
+            session.setChecksum(checksum);
+
+            PublicKey serverPublicKey = packet.getPublicKey();
+            session.setServerPublicKey(serverPublicKey);
+
+            byte[] serverSignature = packet.getSignature();
+            session.setServerSignature(serverSignature);
+
+            // server status message
+            boolean statusSent = false;
+            switch (packet.getStatus()) {
+                case 2:
+                    addon.sendNotification(Lang.Message.STATUS_MESSAGE2.toText());
+                    statusSent = true;
+                    break;
+                case 3:
+                    addon.sendNotification(Lang.Message.STATUS_MESSAGE3.toText());
+                    statusSent = true;
+                    break;
+                case 4:
+                    addon.sendNotification(Lang.Message.STATUS_MESSAGE4.toText());
+                    statusSent = true;
+                    break;
+            }
+
+            String message;
+            boolean syncPasswords = addon.getSettings().isSyncPasswords();
+            if (packet.isRegistered()) {
+
+                server = user.getServer(serverUuid);
+                if (server == null) {
+                    if (syncPasswords) {
+                        if (!credentials.getMasterPassword().isEmpty()) {
+                            addon.sendRequest(new SyncRequest());
+                        } else {
+                            addon.sendMessage("§4[" + Constants.DEFAULT_TITLE + "] §c" + Lang.Message.SYNC_REQUIRE_PASSWORD.toText());
+                            if (!statusSent) {
+                                addon.sendNotification(Lang.Message.SYNC_REQUIRE_PASSWORD.toText());
                             }
-                            return;
                         }
-                    }
-                }
-
-                String encryptedData = packet.getData();
-                String decryptedData;
-                try {
-                    decryptedData = AesGcm.decrypt(encryptedData, cryptKey);
-                } catch (GeneralSecurityException e) {
-                    e.printStackTrace();
-                    synchronized (Constants.LOCK) {
-                        LabyMod.getInstance().displayMessageInChat("§4[" + Constants.DEFAULT_TITLE + "] §c" + Lang.Message.SYNC_FAILED_DECRYPT2.toText());
-                        LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.SYNC_FAILED_DECRYPT2.toText());
                     }
                     return;
                 }
 
-                JsonObject json = Constants.GSON.fromJson(decryptedData, JsonObject.class);
-                Credentials.Server server = Credentials.Server.fromJson(json);
-                if (server != null) {
-                    addon.markModified(true);
-                    Session session = addon.getSession();
-                    session.setServer(server);
-                    session.setRequireSync(true);
-                    user.updateServer(server);
-                    user.addCryptKey(cryptKey);
+                // signature check
+                PublicKey publicKey = server.getPublicKey();
+                byte[] clientRsaChallenge = session.getRsaChallenge();
+                if (publicKey != null) {
+                    if (clientRsaChallenge == null) {
+                        System.err.println(Constants.PREFIX + "The server did not send the challenge, but its public key was previously registered.");
+                        addon.sendNotification(Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                        if (addon.getSettings().isDebug()) {
+                            addon.sendMessage("§3The server did not send the challenge, but its public key was previously registered.");
+                        }
+                        return;
+                    }
 
-                    synchronized (Constants.LOCK) {
-                        LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.SYNC_SYNCING.toText());
+                    if (serverPublicKey == null) {
+                        System.err.println(Constants.PREFIX + "The server did not send its public key.");
+                        addon.sendNotification(Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                        if (addon.getSettings().isDebug()) {
+                            addon.sendMessage("§3The server did not send its public key.");
+                        }
+                        return;
+                    }
 
-                        String password = server.getPassword();
-                        String message = "/login " + password;
+                    if (!Arrays.equals(publicKey.getEncoded(), serverPublicKey.getEncoded())) {
+                        System.err.println(Constants.PREFIX + "The public key of the remote server is not the same as the stored one.");
+                        addon.sendNotification(Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                        if (addon.getSettings().isDebug()) {
+                            addon.sendMessage("§3The public key of the remote server is not the same as the stored one.");
+                        }
+                        return;
+                    }
 
-                        System.out.println(Constants.PREFIX + "Sending '" + message + "'...");
-                        LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
+                    byte[] decrypt = RSA.decrypt(publicKey, serverSignature);
+                    if (decrypt == null) {
+                        System.err.println(Constants.PREFIX + "RSA challenge verification failed: the remote server appears not to have this key pair.");
+                        addon.sendNotification(Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                        if (addon.getSettings().isDebug()) {
+                            addon.sendMessage("§3RSA challenge verification failed: the remote server appears not to have this key pair.");
+                        }
+                        return;
+                    }
+
+                    if (!Arrays.equals(decrypt, clientRsaChallenge)) {
+                        System.err.println(Constants.PREFIX + "The bytes of the challenge are not the same as in cryptography.");
+                        addon.sendNotification(Lang.Message.INVALID_SERVER_SIGNATURE.toText());
+                        if (addon.getSettings().isDebug()) {
+                            addon.sendMessage("§3The bytes of the challenge are not the same as in cryptography.");
+                            addon.sendMessage("§3" + Arrays.toString(decrypt));
+                            addon.sendMessage("§3" + Arrays.toString(clientRsaChallenge));
+                        }
+                        return;
                     }
                 }
+
+                message = "/login " + server.getPassword();
+            } else {
+                String securePassword = SafeGenerator.generatePassword();
+                server = user.updateServer(serverUuid, serverPublicKey, securePassword);
+                addon.markModified(true);
+                message = "/register " + securePassword + " " + securePassword;
+                if (!statusSent) {
+                    addon.sendNotification(Lang.Message.REGISTERING_A_PASSWORD.toText());
+                }
             }
-        });
+
+            session.setServer(server);
+
+            System.out.println(Constants.PREFIX + "Sending '" + message + "'...");
+            if (addon.getSettings().isDebug()) {
+                addon.sendMessage("§3Sending '" + message + "'...");
+            }
+            LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
+
+            if (syncPasswords) {
+                String masterPassword = credentials.getMasterPassword();
+                if (!masterPassword.isEmpty()) {
+                    boolean requireSync = packet.isRequireSync();
+                    if (!requireSync) {
+                        requireSync = !Sha256.hash(Sha256.hash(masterPassword + user.getPrimaryCryptKey())).equals(checksum);
+                    }
+
+                    System.out.println(Constants.PREFIX + "Sync required: " + requireSync);
+                    session.setRequireSync(requireSync);
+                }
+            }
+        }
+    }
+
+    public static void handle0x1(final nLoginAddon addon, final SyncResponse packet) {
+        final Credentials credentials = addon.getCredentials();
+        final Credentials.User user = credentials.getUser();
+
+        String masterPassword = credentials.getMasterPassword();
+        String cryptKey = user.getPrimaryCryptKey();
+        String checksum = addon.getSession().getChecksum();
+        if (!Sha256.hash(Sha256.hash(cryptKey + masterPassword)).equals(checksum)) {
+            boolean detected = false;
+            for (String ck : user.getCryptKeys()) {
+                if (ck.equals(cryptKey)) continue;
+
+                if (Sha256.hash(Sha256.hash(ck + masterPassword)).equals(checksum)) {
+                    detected = true;
+                    cryptKey = ck;
+                    break;
+                }
+            }
+            if (!detected) {
+                try {
+                    String responseCryptKey = packet.getCryptKey();
+                    cryptKey = AesGcm.decrypt(responseCryptKey, masterPassword);
+                } catch (GeneralSecurityException e) {
+                    e.printStackTrace();
+                    addon.sendMessage("§4[" + Constants.DEFAULT_TITLE + "] §c" + Lang.Message.SYNC_FAILED_DECRYPT.toText());
+                    addon.sendNotification(Lang.Message.SYNC_FAILED_DECRYPT.toText());
+                    return;
+                }
+            }
+        }
+
+        String encryptedData = packet.getData();
+        String decryptedData;
+        try {
+            decryptedData = AesGcm.decrypt(encryptedData, cryptKey);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            addon.sendMessage("§4[" + Constants.DEFAULT_TITLE + "] §c" + Lang.Message.SYNC_FAILED_DECRYPT2.toText());
+            addon.sendNotification(Lang.Message.SYNC_FAILED_DECRYPT2.toText());
+            return;
+        }
+
+        JsonObject json = Constants.GSON.fromJson(decryptedData, JsonObject.class);
+        Credentials.Server server = Credentials.Server.fromJson(json);
+        if (server != null) {
+            addon.markModified(true);
+            Session session = addon.getSession();
+            session.setServer(server);
+            session.setRequireSync(true);
+            user.updateServer(server);
+            user.addCryptKey(cryptKey);
+
+            synchronized (Constants.LOCK) {
+                addon.sendNotification(Lang.Message.SYNC_SYNCING.toText());
+
+                String password = server.getPassword();
+                String message = "/login " + password;
+
+                System.out.println(Constants.PREFIX + "Sending '" + message + "'...");
+                LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
+            }
+        }
     }
 
     public static void handle0x2(final nLoginAddon addon, final ServerStatusResponse packet) {
@@ -256,6 +256,11 @@ public class ResponseHandler {
                     Credentials.Server server = session.getServer();
                     if (server != null) {
                         if (session.isRequireSync()) {
+                            try {
+                                Thread.sleep(750);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             Synchronization.sendUpdateRequest(addon, server);
                         }
                     } else {
@@ -267,7 +272,7 @@ public class ResponseHandler {
                             Credentials.User user = credentials.getUser();
                             server = user.updateServer(serverUuid, serverPublicKey, tmpPassword);
                             addon.markModified(true);
-                            LabyMod.getInstance().notifyMessageRaw(Constants.DEFAULT_TITLE, Lang.Message.REGISTERING_A_PASSWORD2.toText());
+                            addon.sendNotification(Lang.Message.REGISTERING_A_PASSWORD2.toText());
                             Synchronization.sendUpdateRequest(addon, server);
                         }
                     }
@@ -277,21 +282,21 @@ public class ResponseHandler {
             case ServerStatusResponse.RSA_CHALLENGE_REJECTED: {
                 System.err.println(Constants.PREFIX + "RSA challenge rejected.");
                 if (addon.getSettings().isDebug()) {
-                    LabyMod.getInstance().displayMessageInChat("§3RSA challenge rejected.");
+                    addon.sendMessage("§3RSA challenge rejected.");
                 }
                 break;
             }
             case ServerStatusResponse.SYNC_REQUEST_REJECTED: {
                 System.err.println(Constants.PREFIX + "Sync request rejected.");
                 if (addon.getSettings().isDebug()) {
-                    LabyMod.getInstance().displayMessageInChat("§3Sync request rejected.");
+                    addon.sendMessage("§3Sync request rejected.");
                 }
                 break;
             }
             case ServerStatusResponse.CHECKSUM_REJECTED: {
                 System.err.println(Constants.PREFIX + "Checksum rejected.");
                 if (addon.getSettings().isDebug()) {
-                    LabyMod.getInstance().displayMessageInChat("§3Checksum rejected.");
+                    addon.sendMessage("§3Checksum rejected.");
                 }
                 break;
             }
