@@ -49,8 +49,6 @@ public class JoinEvent implements Consumer<ServerData> {
 
                         if (LabyMod.getInstance().isInGame()) {
                             addon.sendRequest(ready);
-                            addon.sendMessage("first pkt sent! " + ready.toString());
-                            addon.sendMessage(Arrays.toString(challenge));
                             break;
                         }
 
