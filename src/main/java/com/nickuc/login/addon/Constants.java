@@ -19,8 +19,8 @@ public class Constants {
 
     public static final Object LOCK = nLoginAddon.LOCK;
 
-    public static final Gson GSON = new Gson();
-    public static final Gson GSON_PRETTY = (new GsonBuilder()).setPrettyPrinting().create();
+    public static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+    public static final Gson GSON_PRETTY = (new GsonBuilder()).disableHtmlEscaping().setPrettyPrinting().create();
 
     public static final String DEFAULT_TITLE = "nLogin Addon";
     public static final String NLOGIN_SUBCHANNEL = "nlogin-addon";
