@@ -15,6 +15,7 @@ import com.nickuc.login.addon.nLoginAddon;
 import com.nickuc.login.addon.utils.crypt.AesGcm;
 import com.nickuc.login.addon.utils.hash.Sha256;
 import lombok.Cleanup;
+import lombok.SneakyThrows;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -22,6 +23,7 @@ import java.security.GeneralSecurityException;
 
 public class Synchronization {
 
+    @SneakyThrows
     public static void sendUpdateRequest(final nLoginAddon addon, final Credentials.Server server) {
         Credentials credentials = addon.getCredentials();
         Credentials.User user = credentials.getUser();
