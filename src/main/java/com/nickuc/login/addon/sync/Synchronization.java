@@ -28,7 +28,9 @@ public class Synchronization {
         Credentials credentials = addon.getCredentials();
         Credentials.User user = credentials.getUser();
         String masterPassword = credentials.getMasterPassword();
-        if (masterPassword.isEmpty()) return;
+        if (masterPassword.isEmpty()) {
+            return;
+        }
 
         try {
             String primaryCryptKey = user.getPrimaryCryptKey();
