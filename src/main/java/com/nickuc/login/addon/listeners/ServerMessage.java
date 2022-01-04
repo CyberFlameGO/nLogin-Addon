@@ -16,10 +16,10 @@ import com.nickuc.login.addon.model.response.ReadyResponse;
 import com.nickuc.login.addon.model.response.ServerStatusResponse;
 import com.nickuc.login.addon.model.response.SyncResponse;
 import com.nickuc.login.addon.nLoginAddon;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.labymod.api.events.ServerMessageEvent;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ServerMessage implements ServerMessageEvent {
 
     private final nLoginAddon addon;
