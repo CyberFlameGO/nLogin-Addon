@@ -23,7 +23,6 @@ import net.labymod.api.events.ServerMessageEvent;
 public class ServerMessage implements ServerMessageEvent {
 
     private final nLoginAddon addon;
-    private long lastTimestamp;
 
     @Override
     public void onServerMessage(String subchannel, final JsonElement jsonElement) {
@@ -38,16 +37,17 @@ public class ServerMessage implements ServerMessageEvent {
             }
 
             final int id = json.get("id").getAsInt();
-            if (json.has("timestamp")) {
-                long timestamp = json.get("timestamp").getAsLong();
-                if (timestamp <= lastTimestamp) { // prevent duplicate packets
-                    return;
-                }
-                lastTimestamp = timestamp;
-            }
 
             Session session = addon.getSession();
             if (session.isActive()) {
+                if (json.has("timestamp")) {
+                    long timestamp = json.get("timestamp").getAsLong();
+                    if (timestamp <= session.getLastTimestamp()) { // prevent duplicate packets
+                        return;
+                    }
+                    session.setLastTimestamp(timestamp);
+                }
+
                 session.setUsingNLogin(true);
             }
 

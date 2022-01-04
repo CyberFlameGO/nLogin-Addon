@@ -37,6 +37,8 @@ public class Session {
     private String checksum;
     @Setter
     private String tmpPassword;
+    @Setter
+    private long lastTimestamp;
 
     public void join() {
         quit();
@@ -56,6 +58,7 @@ public class Session {
         rsaChallenge = null;
         checksum = null;
         tmpPassword = null;
+        lastTimestamp = 0;
     }
 
     public void authenticate() {
