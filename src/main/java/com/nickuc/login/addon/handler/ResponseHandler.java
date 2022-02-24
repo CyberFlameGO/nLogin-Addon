@@ -22,7 +22,6 @@ import com.nickuc.login.addon.utils.SafeGenerator;
 import com.nickuc.login.addon.utils.crypt.AesGcm;
 import com.nickuc.login.addon.utils.crypt.RSA;
 import com.nickuc.login.addon.utils.hash.Sha256;
-import net.labymod.core.LabyModCore;
 import net.labymod.main.LabyMod;
 
 import java.security.GeneralSecurityException;
@@ -165,7 +164,7 @@ public class ResponseHandler {
             if (addon.getSettings().isDebug()) {
                 addon.sendMessage("§3Sending '" + message + "'...");
             }
-            LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
+            addon.sendChatPacket(message);
 
             if (syncPasswords) {
                 String masterPassword = credentials.getMasterPassword();
@@ -241,7 +240,7 @@ public class ResponseHandler {
                 String message = "/login " + password;
 
                 System.out.println(Constants.PREFIX + "Sending '" + message + "'...");
-                LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
+                addon.sendChatPacket(message);
             }
         }
     }

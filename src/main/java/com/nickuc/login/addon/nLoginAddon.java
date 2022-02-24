@@ -9,29 +9,26 @@ package com.nickuc.login.addon;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.nickuc.login.addon.event.EventHandler;
+import com.nickuc.login.addon.event.LMEventService;
 import com.nickuc.login.addon.lang.Lang;
-import com.nickuc.login.addon.listeners.JoinEvent;
-import com.nickuc.login.addon.listeners.MessageReceived;
-import com.nickuc.login.addon.listeners.QuitEvent;
-import com.nickuc.login.addon.listeners.ServerMessage;
 import com.nickuc.login.addon.model.AddonSettings;
 import com.nickuc.login.addon.model.Credentials;
 import com.nickuc.login.addon.model.Session;
 import com.nickuc.login.addon.model.request.Request;
 import com.nickuc.login.addon.model.response.Response;
 import com.nickuc.login.addon.updater.Updater;
+import com.nickuc.login.addon.utils.MaterialUtils;
 import io.netty.buffer.Unpooled;
 import lombok.Cleanup;
 import lombok.Getter;
 import net.labymod.addon.AddonConfig;
-import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
 import net.labymod.core.LabyModCore;
 import net.labymod.gui.elements.DropDownMenu;
 import net.labymod.main.LabyMod;
 import net.labymod.settings.elements.*;
 import net.labymod.utils.Consumer;
-import net.labymod.utils.Material;
 import net.labymod.utils.manager.ConfigManager;
 import net.minecraft.network.PacketBuffer;
 import org.apache.commons.io.IOUtils;
@@ -50,6 +47,8 @@ public class nLoginAddon extends LabyModAddon {
     public static final Object LOCK = new Object();
 
     private final Session session = new Session();
+    @Getter
+    private EventHandler eventHandler;
     private File credentialsFile;
     @Getter
     private Credentials credentials;
@@ -59,11 +58,6 @@ public class nLoginAddon extends LabyModAddon {
 
     @Override
     public void onEnable() {
-        EventManager eventManager = getApi().getEventManager();
-        eventManager.registerOnJoin(new JoinEvent(this));
-        eventManager.registerOnQuit(new QuitEvent(this));
-        eventManager.register(new ServerMessage(this));
-        eventManager.register(new MessageReceived(this));
         Updater.checkForUpdates(Constants.VERSION);
         if (Updater.isUpdateAvailable()) {
             Timer timer = new Timer("nLoginAddon$UpdateWarning");
@@ -73,6 +67,12 @@ public class nLoginAddon extends LabyModAddon {
                     sendNotification(String.format(Lang.Message.UPDATE_AVAILABLE.toText(), "v" + Constants.VERSION, Updater.getNewerVersion()));
                 }
             }, TimeUnit.SECONDS.toMillis(30), TimeUnit.MINUTES.toMillis(30));
+        }
+        eventHandler = new EventHandler(this);
+        try {
+            LMEventService.getImplementation().registerEvents(this);
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -197,7 +197,7 @@ public class nLoginAddon extends LabyModAddon {
     @Override
     protected void fillSettings(final List<SettingsElement> settings) {
 
-        final BooleanElement enabledElement = new BooleanElement(Lang.Message.ENABLED_NAME.toText(), new ControlElement.IconData(Material.LEVER), new Consumer<Boolean>() {
+        final BooleanElement enabledElement = new BooleanElement(Lang.Message.ENABLED_NAME.toText(), new ControlElement.IconData(MaterialUtils.LEVER), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
                 nLoginAddon.this.settings.setEnabled(result);
@@ -205,7 +205,7 @@ public class nLoginAddon extends LabyModAddon {
             }
         }, nLoginAddon.this.settings.isEnabled());
 
-        final BooleanElement debugElement = new BooleanElement(Lang.Message.DEBUG_NAME.toText(), new ControlElement.IconData(Material.COMMAND), new Consumer<Boolean>() {
+        final BooleanElement debugElement = new BooleanElement(Lang.Message.DEBUG_NAME.toText(), new ControlElement.IconData(MaterialUtils.COMMAND_BLOCK), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
                 nLoginAddon.this.settings.setDebug(result);
@@ -214,7 +214,7 @@ public class nLoginAddon extends LabyModAddon {
         }, nLoginAddon.this.settings.isDebug());
         debugElement.setDescriptionText(Lang.Message.DEBUG_DESCRIPTION.toText());
 
-        final BooleanElement securityWarningsElement = new BooleanElement(Lang.Message.SECURITY_WARNINGS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
+        final BooleanElement securityWarningsElement = new BooleanElement(Lang.Message.SECURITY_WARNINGS_NAME.toText(), new ControlElement.IconData(MaterialUtils.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
                 nLoginAddon.this.settings.setSecurityWarnings(result);
@@ -223,7 +223,7 @@ public class nLoginAddon extends LabyModAddon {
         }, nLoginAddon.this.settings.isSecurityWarnings());
         securityWarningsElement.setDescriptionText(Lang.Message.SECURITY_WARNINGS_DESCRIPTION.toText());
 
-        final BooleanElement saveLoginElement = new BooleanElement(Lang.Message.SAVE_LOGIN_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
+        final BooleanElement saveLoginElement = new BooleanElement(Lang.Message.SAVE_LOGIN_NAME.toText(), new ControlElement.IconData(MaterialUtils.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
                 nLoginAddon.this.settings.setSaveLogin(result);
@@ -232,7 +232,7 @@ public class nLoginAddon extends LabyModAddon {
         }, nLoginAddon.this.settings.isSaveLogin());
         saveLoginElement.setDescriptionText(Lang.Message.SAVE_LOGIN_DESCRIPTION.toText());
 
-        final BooleanElement storePasswordElement = new BooleanElement(Lang.Message.SYNC_PASSWORDS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
+        final BooleanElement storePasswordElement = new BooleanElement(Lang.Message.SYNC_PASSWORDS_NAME.toText(), new ControlElement.IconData(MaterialUtils.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
             @Override
             public void accept(Boolean result) {
                 nLoginAddon.this.settings.setSyncPasswords(result);
@@ -241,7 +241,7 @@ public class nLoginAddon extends LabyModAddon {
         }, nLoginAddon.this.settings.isSyncPasswords());
         storePasswordElement.setDescriptionText(Lang.Message.SYNC_PASSWORDS_DESCRIPTION.toText());
 
-        final StringElement masterPasswordElement = new StringElement(Lang.Message.MASTER_PASSWORD_NAME.toText(), new ControlElement.IconData(Material.PAPER), credentials.getMasterPassword(), new Consumer<String>() {
+        final StringElement masterPasswordElement = new StringElement(Lang.Message.MASTER_PASSWORD_NAME.toText(), new ControlElement.IconData(MaterialUtils.PAPER), credentials.getMasterPassword(), new Consumer<String>() {
             @Override
             public void accept(String password) {
                 credentials.setMasterPassword(password.trim());
@@ -320,6 +320,12 @@ public class nLoginAddon extends LabyModAddon {
     public void sendMessage(String message) {
         synchronized (Constants.LOCK) {
             LabyMod.getInstance().displayMessageInChat(message);
+        }
+    }
+
+    public void sendChatPacket(String message) {
+        synchronized (Constants.LOCK) {
+            LabyModCore.getMinecraft().getPlayer().sendChatMessage(message);
         }
     }
 
