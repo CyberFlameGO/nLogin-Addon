@@ -50,15 +50,16 @@ public class Http {
             FileOutputStream[] fosArray = new FileOutputStream[output.length];
             BufferedOutputStream[] boutArray = new BufferedOutputStream[output.length];
             try {
+                int bufSize = 8192;
                 for (int i = 0; i < output.length; i++) {
-                    boutArray[i] = new BufferedOutputStream(fosArray[i] = new FileOutputStream(output[i]), 1024);
+                    boutArray[i] = new BufferedOutputStream(fosArray[i] = new FileOutputStream(output[i]), bufSize);
                 }
 
-                byte[] data = new byte[1024];
+                byte[] buf = new byte[bufSize];
                 int cp;
-                while ((cp = bin.read(data, 0, 1024)) >= 0) {
+                while ((cp = bin.read(buf, 0, buf.length)) >= 0) {
                     for (BufferedOutputStream bout : boutArray) {
-                        bout.write(data, 0, cp);
+                        bout.write(buf, 0, cp);
                     }
                 }
             } finally {

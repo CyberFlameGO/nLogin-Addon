@@ -95,9 +95,14 @@ public class Installer extends JPanel {
                 return;
             }
 
+            File addonFile116 = mkdirsAndRemove("1.16", labyModFolder, lang);
+            if (addonFile116 == null) {
+                return;
+            }
+
             try {
-                Http.download(DOWNLOAD_URL, addonFile18, addonFile112);
-                if (addonFile18.exists() && addonFile112.exists()) {
+                Http.download(DOWNLOAD_URL, addonFile18, addonFile112, addonFile116);
+                if (addonFile18.exists() && addonFile112.exists() && addonFile116.exists()) {
                     sendMessage(INSTALLATION_SUCCESS[lang], SUCCESSFUL_INSTALLATION[lang], false);
                     System.exit(0);
                 } else {
@@ -132,7 +137,7 @@ public class Installer extends JPanel {
 
         File addonFile = new File(addons, "nLogin-Addon.jar");
         if (addonFile.exists() && !addonFile.delete()) {
-            sendMessage(String.format(INSTALLATION_ERR_DEL[lang], "1.8"), FAILED_TO_INSTALL[lang], true);
+            sendMessage(String.format(INSTALLATION_ERR_DEL[lang], ver), FAILED_TO_INSTALL[lang], true);
             System.exit(1);
             return null;
         }
