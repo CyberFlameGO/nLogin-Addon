@@ -25,7 +25,7 @@ import net.labymod.api.event.Subscribe;
 import net.labymod.api.event.events.client.chat.MessageReceiveEvent;
 import net.labymod.api.event.events.client.chat.MessageSendEvent;
 import net.labymod.api.event.events.network.ServerMessageEvent;
-import net.labymod.api.event.events.network.server.ServerEvent;
+import net.labymod.api.event.events.network.server.LoginServerEvent;
 import net.labymod.core.ChatComponent;
 import net.labymod.core.LabyModCore;
 import net.labymod.gui.elements.DropDownMenu;
@@ -176,7 +176,7 @@ public class LMAddon1165 extends LabyModBootstrap {
             packetBuffer.writeString(messageKey);
             packetBuffer.writeString(message);
             System.out.println(Constants.PREFIX + messageKey + ": " + message);
-            LabyModCore.getMinecraft().sendPluginMessage("LMC", packetBuffer);
+            LabyModCore.getMinecraft().sendPluginMessage("labymod3:main", packetBuffer);
         }
     }
 
@@ -208,7 +208,7 @@ public class LMAddon1165 extends LabyModBootstrap {
         eventService.registerListener(new EventListener(eventHandler));
     }
 
-    private static class EventListener {
+    public static class EventListener {
 
         private final EventHandler eventHandler;
 
@@ -217,7 +217,7 @@ public class LMAddon1165 extends LabyModBootstrap {
         }
 
         @Subscribe
-        public void onServerEvent(ServerEvent event) {
+        public void onServerEvent(LoginServerEvent event) {
             eventHandler.handleJoin();
         }
 

@@ -197,7 +197,7 @@ public class LMAddon189 extends LabyModBootstrap {
             packetBuffer.writeString(messageKey);
             packetBuffer.writeString(message);
             System.out.println(Constants.PREFIX + messageKey + ": " + message);
-            LabyModCore.getMinecraft().sendPluginMessage("LMC", packetBuffer);
+            LabyModCore.getMinecraft().sendPluginMessage("labymod3:main", packetBuffer);
         }
     }
 

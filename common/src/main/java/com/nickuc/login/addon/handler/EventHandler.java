@@ -29,10 +29,10 @@ import java.util.concurrent.TimeUnit;
 
 public class EventHandler {
 
-    private static final Set<String> COMMANDS = new HashSet<>();
+    private static final Set<String> AUTH_COMMANDS = new HashSet<>();
 
     static {
-        COMMANDS.addAll(Arrays.asList(
+        AUTH_COMMANDS.addAll(Arrays.asList(
                 "/login",
                 "/logar",
                 "/log",
@@ -62,6 +62,13 @@ public class EventHandler {
 
             final ReadyRequest ready = new ReadyRequest(credentials.getUuid(), challenge, addon.getSettings());
             Constants.EXECUTOR_SERVICE.submit(() -> {
+                try {
+                    Thread.sleep(1000L); // wait for 1s (prevent message from antibot system)
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+
                 int wait = 3000;
                 int sleep = 100;
                 for (int i = 0; i < wait / sleep; i++) {
@@ -76,8 +83,8 @@ public class EventHandler {
 
                     try {
                         Thread.sleep(sleep);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt();
                         break;
                     }
                 }
@@ -95,9 +102,7 @@ public class EventHandler {
             String[] parts = message.split(" ");
             if (parts.length > 1) {
                 String command = parts[0].toLowerCase();
-
-                // switch are not supported in java 1.6
-                if (COMMANDS.contains(command)) {
+                if (AUTH_COMMANDS.contains(command)) {
                     String password = parts[1];
                     addon.getSession().setTmpPassword(password);
                 }
