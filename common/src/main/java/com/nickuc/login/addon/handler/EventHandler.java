@@ -115,13 +115,12 @@ public class EventHandler {
         if (addon.getSettings().isEnabled()) {
             Session session = addon.getSession();
             if (!session.isUnsafeServerWarn() && (rawMessage.contains("/register ") || rawMessage.contains("/registrar "))) {
+                session.setUnsafeServerWarn(true);
                 Constants.EXECUTOR_SERVICE.submit(() -> {
                     try {
                         Thread.sleep(TimeUnit.SECONDS.toMillis(2));
-                        Session session1 = addon.getSession();
-                        if (!session1.isUnsafeServerWarn() && session1.isActive() && !session1.isUsingNLogin()) {
+                        if (platform.isConnected() && session.isActive() && !session.isUsingNLogin()) {
                             platform.sendNotification(Lang.Message.STATUS_UNKNOWN.toText());
-                            session1.setUnsafeServerWarn(true);
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
