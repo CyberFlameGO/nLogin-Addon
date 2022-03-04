@@ -1,28 +1,9 @@
 plugins {
     id 'java'
-    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
-
-group 'com.nickuc.login.addon.installer'
-version '1.0-SNAPSHOT'
 
 tasks.build.dependsOn('shadowJar')
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-}
-
-compileJava {
-    options.encoding('UTF-8')
-
-    sourceCompatibility('1.8')
-    targetCompatibility('1.8')
-}
 
 jar {
     manifest {

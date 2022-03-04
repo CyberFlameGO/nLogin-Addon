@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+tasks.build.dependsOn('shadowJar')
+
+dependencies {
+    compile files("${rootDir}/../labymod-common/build/libs/lm-common.jar")
+    compile files("${rootDir}/../labymod-1.8.9/build/libs/labymod-1.8.9.jar")
+    compile files("${rootDir}/../labymod-1.12.2/build/libs/labymod-1.12.2.jar")
+    compile files("${rootDir}/../labymod-1.16.5/build/libs/labymod-1.16.5.jar")
+}
+
+shadowJar {
+    archiveName('nLogin-Addon.jar')
+}

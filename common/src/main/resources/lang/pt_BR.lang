@@ -1,0 +1,27 @@
+settings.enabled.name=Ativado
+settings.debug.name=Depuração
+settings.debug.description=Ativa o modo de desenvolvedor.
+settings.save-login.name=Salvar logins
+settings.save-login.description=Salva os logins que foram cadastrados manualmente.
+settings.sync-passwords.name=Sincronizar senhas
+settings.sync-passwords.description=Sincroniza as suas senhas de forma &acriptograda &fremotamente, com a técnica de &azero-conhecimento&f.
+settings.master-password.name=Senha mestra
+settings.master-password.description=Essa é a sua &6senha mestra&f. Se você trocar de computador, ainda poderá logar.\n&cO recurso de sincronização precisa dessa senha.
+settings.security-warnings.name=Alertas de segurança
+settings.security-warnings.description=Envia alertas de segurança ao entrar em servidores que podem ser inseguros.
+
+in-game.invalid-server-uuid=O ID do servidor é inválido.
+in-game.invalid-server-pbkey=A chave pública do servidor é inválida.
+in-game.invalid-server-signature=A assinatura do servidor é inválida.
+in-game.registering-a-password=Registrando uma senha segura...
+in-game.registering-a-password2=Salvando a senha da conta...
+in-game.sync.failed-encrypt=Falha ao encriptar: impossível sincronizar.
+in-game.sync.require-password=Falha ao logar: é necessário configurar uma senha mestra para acessar.
+in-game.sync.failed-decrypt=Falha ao decriptar: a senha mestra configurada está correta?
+in-game.sync.failed-decrypt2=Falha ao decriptar: os dados remotos estão corrompidos?
+in-game.sync.syncing=Sincronizando...
+in-game.status.message2=Informações deste servidor:\n&fAnti-Logger: &a✔ &f| Criptografia: &c✗
+in-game.status.message3=Informações deste servidor:\n&fAnti-Logger: &c✗ &f| Criptografia: &a✔
+in-game.status.message4=Informações deste servidor:\n&fAnti-Logger: &c✗ &f| Criptografia: &c✗
+in-game.status.unknown=Insira senhas únicas neste servidor para evitar vazamentos.
+in-game.update-available=Uma nova versão está disponível.\n&b%s &f-> &b%s

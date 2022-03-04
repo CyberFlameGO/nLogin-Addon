@@ -1,0 +1,7 @@
+rootProject.name = 'nLogin-Addon'
+include 'installer'
+include 'common'
+include 'labymod-common'
+//include 'labymod-1.8.9'
+//include 'labymod-1.12.2'
+//include 'labymod-1.16.5'

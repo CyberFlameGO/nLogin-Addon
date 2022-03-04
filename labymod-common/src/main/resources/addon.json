@@ -1,0 +1,10 @@
+{
+  "uuid": "%uuid%",
+  "name": "nLogin Addon",
+  "mainClass": "com.nickuc.login.addon.bootstrap.LMAddon",
+  "description": "Automatically creates a strong password when logging into servers with nLogin.",
+  "version": 1,
+  "author": "NickUC",
+  "category": 2,
+  "icon": "https://www.nickuc.com/app/content/assets/img/nlogin-white.png"
+}
