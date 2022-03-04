@@ -48,7 +48,7 @@ public class LMAddon189 extends LabyModBootstrap {
         try {
             configManagerField = LabyModAddon.class.getDeclaredField("configManager");
             configManagerField.setAccessible(true);
-        } catch (ReflectiveOperationException e) {
+        } catch (NoSuchFieldException e) {
             configManagerField = null;
         }
         CONFIG_MANAGER_FIELD = configManagerField;
@@ -142,7 +142,7 @@ public class LMAddon189 extends LabyModBootstrap {
         }
 
         final DropDownMenu<String> langSelectorDropDownMenu = new DropDownMenu<String>("Language", 0, 0, 0, 0).fill(langTypes);
-        DropDownElement<String> langSelectorDropDown = new DropDownElement<>("Language", langSelectorDropDownMenu);
+        DropDownElement<String> langSelectorDropDown = new DropDownElement<String>("Language", langSelectorDropDownMenu);
         langSelectorDropDownMenu.setSelected(addonSettings.getLanguage());
 
         langSelectorDropDown.setChangeListener(new Consumer<String>() {
