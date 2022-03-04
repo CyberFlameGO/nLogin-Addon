@@ -7,6 +7,7 @@
 
 package com.nickuc.login.addon.bootstrap.versions;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.nickuc.login.addon.Constants;
 import com.nickuc.login.addon.bootstrap.LMAddon;
@@ -19,19 +20,18 @@ import com.nickuc.login.addon.model.request.Request;
 import com.nickuc.login.addon.nLoginAddon;
 import io.netty.buffer.Unpooled;
 import net.labymod.addon.AddonConfig;
+import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
-import net.labymod.api.event.EventService;
-import net.labymod.api.event.Subscribe;
-import net.labymod.api.event.events.client.chat.MessageReceiveEvent;
-import net.labymod.api.event.events.client.chat.MessageSendEvent;
-import net.labymod.api.event.events.network.ServerMessageEvent;
-import net.labymod.api.event.events.network.server.LoginServerEvent;
-import net.labymod.core.ChatComponent;
+import net.labymod.api.events.MessageReceiveEvent;
+import net.labymod.api.events.MessageSendEvent;
+import net.labymod.api.events.ServerMessageEvent;
 import net.labymod.core.LabyModCore;
 import net.labymod.gui.elements.DropDownMenu;
 import net.labymod.main.LabyMod;
 import net.labymod.settings.elements.*;
+import net.labymod.utils.Consumer;
 import net.labymod.utils.Material;
+import net.labymod.utils.ServerData;
 import net.labymod.utils.manager.ConfigManager;
 import net.minecraft.network.PacketBuffer;
 
@@ -39,7 +39,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public class LMAddon1165 extends LabyModBootstrap {
+public class LMAddon18 extends LabyModBootstrap {
 
     private static final Field CONFIG_MANAGER_FIELD;
 
@@ -48,7 +48,7 @@ public class LMAddon1165 extends LabyModBootstrap {
         try {
             configManagerField = LabyModAddon.class.getDeclaredField("configManager");
             configManagerField.setAccessible(true);
-        } catch (ReflectiveOperationException e) {
+        } catch (NoSuchFieldException e) {
             configManagerField = null;
         }
         CONFIG_MANAGER_FIELD = configManagerField;
@@ -56,7 +56,7 @@ public class LMAddon1165 extends LabyModBootstrap {
 
     private final nLoginAddon addon = new nLoginAddon(this, this);
 
-    public LMAddon1165(LMAddon addonInstance) {
+    public LMAddon18(LMAddon addonInstance) {
         super(addonInstance);
     }
 
@@ -79,41 +79,59 @@ public class LMAddon1165 extends LabyModBootstrap {
 
     @Override
     public void fillSettings(List<SettingsElement> settingsElements) {
-        AddonSettings addonSettings = addon.getSettings();
-        Credentials credentials = addon.getCredentials();
+        final AddonSettings addonSettings = addon.getSettings();
+        final Credentials credentials = addon.getCredentials();
 
-        final BooleanElement enabledElement = new BooleanElement(Lang.Message.ENABLED_NAME.toText(), new ControlElement.IconData(Material.LEVER), result -> {
-            addonSettings.setEnabled(result);
-            addon.markModified(false);
+        final BooleanElement enabledElement = new BooleanElement(Lang.Message.ENABLED_NAME.toText(), new ControlElement.IconData(Material.LEVER), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                addonSettings.setEnabled(result);
+                addon.markModified(false);
+            }
         }, addonSettings.isEnabled());
 
-        final BooleanElement debugElement = new BooleanElement(Lang.Message.DEBUG_NAME.toText(), new ControlElement.IconData(Material.COMMAND), result -> {
-            addonSettings.setDebug(result);
-            addon.markModified(false);
+        final BooleanElement debugElement = new BooleanElement(Lang.Message.DEBUG_NAME.toText(), new ControlElement.IconData(Material.COMMAND), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                addonSettings.setDebug(result);
+                addon.markModified(false);
+            }
         }, addonSettings.isDebug());
         debugElement.setDescriptionText(Lang.Message.DEBUG_DESCRIPTION.toText());
 
-        final BooleanElement securityWarningsElement = new BooleanElement(Lang.Message.SECURITY_WARNINGS_NAME.toText(), new ControlElement.IconData(Material.COMPARATOR), result -> {
-            addonSettings.setSecurityWarnings(result);
-            addon.markModified(false);
+        final BooleanElement securityWarningsElement = new BooleanElement(Lang.Message.SECURITY_WARNINGS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                addonSettings.setSecurityWarnings(result);
+                addon.markModified(false);
+            }
         }, addonSettings.isSecurityWarnings());
         securityWarningsElement.setDescriptionText(Lang.Message.SECURITY_WARNINGS_DESCRIPTION.toText());
 
-        final BooleanElement saveLoginElement = new BooleanElement(Lang.Message.SAVE_LOGIN_NAME.toText(), new ControlElement.IconData(Material.COMPARATOR), result -> {
-            addonSettings.setSaveLogin(result);
-            addon.markModified(false);
+        final BooleanElement saveLoginElement = new BooleanElement(Lang.Message.SAVE_LOGIN_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                addonSettings.setSaveLogin(result);
+                addon.markModified(false);
+            }
         }, addonSettings.isSaveLogin());
         saveLoginElement.setDescriptionText(Lang.Message.SAVE_LOGIN_DESCRIPTION.toText());
 
-        final BooleanElement storePasswordElement = new BooleanElement(Lang.Message.SYNC_PASSWORDS_NAME.toText(), new ControlElement.IconData(Material.COMPARATOR), result -> {
-            addonSettings.setSyncPasswords(result);
-            addon.markModified(false);
+        final BooleanElement storePasswordElement = new BooleanElement(Lang.Message.SYNC_PASSWORDS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean result) {
+                addonSettings.setSyncPasswords(result);
+                addon.markModified(false);
+            }
         }, addonSettings.isSyncPasswords());
         storePasswordElement.setDescriptionText(Lang.Message.SYNC_PASSWORDS_DESCRIPTION.toText());
 
-        final StringElement masterPasswordElement = new StringElement(Lang.Message.MASTER_PASSWORD_NAME.toText(), new ControlElement.IconData(Material.PAPER), credentials.getMasterPassword(), password -> {
-            credentials.setMasterPassword(password.trim());
-            addon.markModified(true);
+        final StringElement masterPasswordElement = new StringElement(Lang.Message.MASTER_PASSWORD_NAME.toText(), new ControlElement.IconData(Material.PAPER), credentials.getMasterPassword(), new Consumer<String>() {
+            @Override
+            public void accept(String password) {
+                credentials.setMasterPassword(password.trim());
+                addon.markModified(true);
+            }
         });
         masterPasswordElement.setDescriptionText(Lang.Message.MASTER_PASSWORD_DESCRIPTION.toText());
 
@@ -124,12 +142,15 @@ public class LMAddon1165 extends LabyModBootstrap {
         }
 
         final DropDownMenu<String> langSelectorDropDownMenu = new DropDownMenu<String>("Language", 0, 0, 0, 0).fill(langTypes);
-        DropDownElement<String> langSelectorDropDown = new DropDownElement<>("Language", langSelectorDropDownMenu);
+        DropDownElement<String> langSelectorDropDown = new DropDownElement<String>("Language", langSelectorDropDownMenu);
         langSelectorDropDownMenu.setSelected(addonSettings.getLanguage());
 
-        langSelectorDropDown.setChangeListener(type -> {
-            addonSettings.setLanguage(type);
-            addon.markModified(false);
+        langSelectorDropDown.setChangeListener(new Consumer<String>() {
+            @Override
+            public void accept(String type) {
+                addonSettings.setLanguage(type);
+                addon.markModified(false);
+            }
         });
 
         /*
@@ -203,40 +224,38 @@ public class LMAddon1165 extends LabyModBootstrap {
 
     @Override
     public void registerEvents() {
-        EventHandler eventHandler = addon.getEventHandler();
-        EventService eventService = getAddonInstance().getApi().getEventService();
-        eventService.registerListener(new EventListener(eventHandler));
+        final EventHandler eventHandler = addon.getEventHandler();
+        EventManager eventManager = getAddonInstance().getApi().getEventManager();
+        eventManager.registerOnJoin(new Consumer<ServerData>() {
+            @Override
+            public void accept(ServerData serverData) {
+                eventHandler.handleJoin();
+            }
+        });
+        eventManager.registerOnQuit(new Consumer<ServerData>() {
+            @Override
+            public void accept(ServerData serverData) {
+                eventHandler.handleQuit();
+            }
+        });
+        eventManager.register(new MessageSendEvent() {
+            @Override
+            public boolean onSend(String message) {
+                return eventHandler.handleChat(message);
+            }
+        });
+        eventManager.register(new ServerMessageEvent() {
+            @Override
+            public void onServerMessage(String subChannel, JsonElement jsonElement) {
+                eventHandler.handleServerMessage(subChannel, jsonElement);
+            }
+        });
+        eventManager.register(new MessageReceiveEvent() {
+            @Override
+            public boolean onReceive(String formatted, String unformatted) {
+                eventHandler.handleReceivedMessage(unformatted);
+                return false;
+            }
+        });
     }
-
-    public static class EventListener {
-
-        private final EventHandler eventHandler;
-
-        public EventListener(EventHandler eventHandler) {
-            this.eventHandler = eventHandler;
-        }
-
-        @Subscribe
-        public void onServerEvent(LoginServerEvent event) {
-            eventHandler.handleJoin();
-        }
-
-        @Subscribe
-        public void onMessageReceive(MessageReceiveEvent event) {
-            ChatComponent chatComponent = LabyModCore.getCoreAdapter().getMinecraftImplementation().getChatComponent(event.getComponent());
-            eventHandler.handleReceivedMessage(chatComponent.getUnformattedText());
-        }
-
-        @Subscribe
-        public void onMessageSend(MessageSendEvent event) {
-            eventHandler.handleChat(event.getMessage());
-        }
-
-        @Subscribe
-        public void onServerMessage(ServerMessageEvent event) {
-            eventHandler.handleServerMessage(event.getMessageKey(), event.getServerMessage());
-        }
-
-    }
-
 }

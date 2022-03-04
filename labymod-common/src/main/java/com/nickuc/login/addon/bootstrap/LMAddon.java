@@ -20,9 +20,9 @@ import java.util.TimerTask;
 public class LMAddon extends LabyModAddon {
 
     private static final String[] BOOTSTRAP_CLASSES = {
-        "com.nickuc.login.addon.bootstrap.versions.LMAddon189",
-        "com.nickuc.login.addon.bootstrap.versions.LMAddon1122",
-        "com.nickuc.login.addon.bootstrap.versions.LMAddon1165",
+        "com.nickuc.login.addon.bootstrap.versions.LMAddon18",
+        "com.nickuc.login.addon.bootstrap.versions.LMAddon112",
+        "com.nickuc.login.addon.bootstrap.versions.LMAddon116",
     };
 
     private LabyModBootstrap bootstrap;

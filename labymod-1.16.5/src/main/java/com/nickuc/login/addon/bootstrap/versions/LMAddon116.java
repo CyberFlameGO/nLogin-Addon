@@ -19,8 +19,14 @@ import com.nickuc.login.addon.model.request.Request;
 import com.nickuc.login.addon.nLoginAddon;
 import io.netty.buffer.Unpooled;
 import net.labymod.addon.AddonConfig;
-import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
+import net.labymod.api.event.EventService;
+import net.labymod.api.event.Subscribe;
+import net.labymod.api.event.events.client.chat.MessageReceiveEvent;
+import net.labymod.api.event.events.client.chat.MessageSendEvent;
+import net.labymod.api.event.events.network.ServerMessageEvent;
+import net.labymod.api.event.events.network.server.LoginServerEvent;
+import net.labymod.core.ChatComponent;
 import net.labymod.core.LabyModCore;
 import net.labymod.gui.elements.DropDownMenu;
 import net.labymod.main.LabyMod;
@@ -33,7 +39,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public class LMAddon1122 extends LabyModBootstrap {
+public class LMAddon116 extends LabyModBootstrap {
 
     private static final Field CONFIG_MANAGER_FIELD;
 
@@ -50,7 +56,7 @@ public class LMAddon1122 extends LabyModBootstrap {
 
     private final nLoginAddon addon = new nLoginAddon(this, this);
 
-    public LMAddon1122(LMAddon addonInstance) {
+    public LMAddon116(LMAddon addonInstance) {
         super(addonInstance);
     }
 
@@ -87,19 +93,19 @@ public class LMAddon1122 extends LabyModBootstrap {
         }, addonSettings.isDebug());
         debugElement.setDescriptionText(Lang.Message.DEBUG_DESCRIPTION.toText());
 
-        final BooleanElement securityWarningsElement = new BooleanElement(Lang.Message.SECURITY_WARNINGS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), result -> {
+        final BooleanElement securityWarningsElement = new BooleanElement(Lang.Message.SECURITY_WARNINGS_NAME.toText(), new ControlElement.IconData(Material.COMPARATOR), result -> {
             addonSettings.setSecurityWarnings(result);
             addon.markModified(false);
         }, addonSettings.isSecurityWarnings());
         securityWarningsElement.setDescriptionText(Lang.Message.SECURITY_WARNINGS_DESCRIPTION.toText());
 
-        final BooleanElement saveLoginElement = new BooleanElement(Lang.Message.SAVE_LOGIN_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), result -> {
+        final BooleanElement saveLoginElement = new BooleanElement(Lang.Message.SAVE_LOGIN_NAME.toText(), new ControlElement.IconData(Material.COMPARATOR), result -> {
             addonSettings.setSaveLogin(result);
             addon.markModified(false);
         }, addonSettings.isSaveLogin());
         saveLoginElement.setDescriptionText(Lang.Message.SAVE_LOGIN_DESCRIPTION.toText());
 
-        final BooleanElement storePasswordElement = new BooleanElement(Lang.Message.SYNC_PASSWORDS_NAME.toText(), new ControlElement.IconData(Material.REDSTONE_COMPARATOR), result -> {
+        final BooleanElement storePasswordElement = new BooleanElement(Lang.Message.SYNC_PASSWORDS_NAME.toText(), new ControlElement.IconData(Material.COMPARATOR), result -> {
             addonSettings.setSyncPasswords(result);
             addon.markModified(false);
         }, addonSettings.isSyncPasswords());
@@ -198,17 +204,39 @@ public class LMAddon1122 extends LabyModBootstrap {
     @Override
     public void registerEvents() {
         EventHandler eventHandler = addon.getEventHandler();
-        EventManager eventManager = getAddonInstance().getApi().getEventManager();
-
-        eventManager.registerOnJoin(serverData -> eventHandler.handleJoin());
-        eventManager.registerOnQuit(serverData -> eventHandler.handleQuit());
-
-        eventManager.register(eventHandler::handleChat);
-        eventManager.register(eventHandler::handleServerMessage);
-
-        eventManager.register((formatted, unformatted) -> {
-            eventHandler.handleReceivedMessage(unformatted);
-            return false;
-        });
+        EventService eventService = getAddonInstance().getApi().getEventService();
+        eventService.registerListener(new EventListener(eventHandler));
     }
+
+    public static class EventListener {
+
+        private final EventHandler eventHandler;
+
+        public EventListener(EventHandler eventHandler) {
+            this.eventHandler = eventHandler;
+        }
+
+        @Subscribe
+        public void onServerEvent(LoginServerEvent event) {
+            eventHandler.handleJoin();
+        }
+
+        @Subscribe
+        public void onMessageReceive(MessageReceiveEvent event) {
+            ChatComponent chatComponent = LabyModCore.getCoreAdapter().getMinecraftImplementation().getChatComponent(event.getComponent());
+            eventHandler.handleReceivedMessage(chatComponent.getUnformattedText());
+        }
+
+        @Subscribe
+        public void onMessageSend(MessageSendEvent event) {
+            eventHandler.handleChat(event.getMessage());
+        }
+
+        @Subscribe
+        public void onServerMessage(ServerMessageEvent event) {
+            eventHandler.handleServerMessage(event.getMessageKey(), event.getServerMessage());
+        }
+
+    }
+
 }
